@@ -1,41 +1,44 @@
 " VIMRC
 " MAINTAINER: Leo Lahti <leo.lahti1@gmail.com>
 " Basic config {{{
- let mapleader=" "
- cnoremap W w !sudo tee > /dev/null %
+let mapleader=" "
 
- set encoding=utf8
- set autoread
+" This thing is slightly bugged
+cnoremap W w !sudo tee > /dev/null %
 
- nnoremap <leader>w :w<CR>
+set encoding=utf8
+set autoread
+
+nnoremap <leader>w :w<CR>
 
 " Persistent undo
- set undofile
- set undodir=~/.vim/undodir
- set undolevels=500
- set undoreload=500
+set undofile
+set undodir=~/.vim/undodir
+set undolevels=500
+set undoreload=500
 
 " Backup
- set backupdir=~/.vim/tmp
+set backupdir=~/.vim/tmp
 
 " Swap file
- set directory=~/.vim/swap/
+set directory=~/.vim/swap/
 " }}}
 " Basic UI {{{
- set number
- set showcmd
- set lazyredraw
- set cursorline
- set wildmenu
- set showmatch
+set number
+set showcmd
+set lazyredraw
+set cursorline
+set wildmenu
+set showmatch
+
 " }}}
 " Indent options {{{
- set autoindent
+set autoindent
 " }}}
 " Search options {{{
- set incsearch
- set hlsearch
- set smartcase
+set incsearch
+set hlsearch
+set smartcase
 " }}}
 " Basic keybindings {{{
 
@@ -201,6 +204,11 @@ if filereadable(expand("~/.vimrc_background"))
   hi StatusLine ctermbg=18
 endif
 " }}}
+" Autogroups {{{
+augroup Help
+  autocmd FileType help wincmd L
+augroup END
+"  }}}
 
-
+ 
 " vim:foldmethod=marker:foldlevel=0:expandtab:shiftwidth=2:cc=81
