@@ -1,0 +1,1 @@
+/home/leo/.config/nvim/init.vim
