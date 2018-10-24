@@ -52,6 +52,9 @@ map <leader>to :tabonly<cr>
 map <leader>tc :tabclose<cr>
 map <leader>tm :tabmove 
 map <leader>t<leader> :tabnext <cr>
+
+map <leader>h :<C-u>split<CR>
+map <leader>v :<C-u>vsplit<CR>
 " }}}
 " Plugins {{{
 set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
@@ -81,11 +84,14 @@ if dein#load_state('~/.cache/dein')
   call dein#add('phpactor/phpactor', {'build': 'composer install', 'for': 'php'})
   call dein#add('kristijanhusak/deoplete-phpactor')
   call dein#add('zchee/deoplete-jedi')
-  call dein#add('sebastianmarkow/deoplete-rust')
+  call dein#add('racer-rust/vim-racer')
 
   " Languages
   " Golang
   call dein#add('fatih/vim-go', {'build': ':GoUpdateBinaries'})
+
+  " Rust
+  call dein#add('rust-lang/rust.vim')
 
   " Snippets
   call dein#add('SirVer/ultisnips')
@@ -115,6 +121,9 @@ if dein#load_state('~/.cache/dein')
 
   " Linter
   call dein#add('w0rp/ale')
+
+  " Colourscheme
+  call dein#add('altercation/vim-colors-solarized')
 
   call dein#end()
   call dein#save_state()
@@ -151,7 +160,7 @@ nnoremap <leader>dt :Denite tag<cr>
 " }}}
 " Deoplete {{{
 " clang {{{
-let g:deoplete#sources#clang#libclang_path='/usr/lib/llvm-3.8/lib/clang.so'
+let g:deoplete#sources#clang#libclang_path='/usr/lib/llvm-3.8/lib/libclang.so'
 let g:deoplete#sources#clang#clang_header='/usr/lib/llvm-3.8/lib/clang'
 " }}}
 " clojure {{{
@@ -174,8 +183,19 @@ let g:necoghc_enable_detailed_browse=1
 let g:python3_host_prog = '/usr/bin/python3'
 " }}}
 " Rust {{{
-let g:deoplete#sources#rust#racer_binary='/home/leo/.cargo/bin/env'
+" let g:deoplete#sources#rust#racer_binary='/home/leo/.cargo/bin/racer'
+let g:racer_cmd = "/home/leo/.cargo/bin/racer"
 let g:deoplete#sources#rust#rust_source_path=system('echo `rustc --print sysroot`/lib/rustlib/src/rust/src')
+
+augroup RUST
+  au FileType rust nmap gd <Plug>(rust-def)
+  au FileType rust nmap gs <Plug>(rust-def-split)
+  au FileType rust nmap gx <Plug>(rust-def-vertical)
+  au FileType rust nmap <leader>gd <Plug>(rust-doc)
+augroup END
+
+" General Rust
+let g:rustfmt_autosave = 1
 " }}}
 let g:deoplete#enable_at_startup=1
 " }}}
@@ -199,11 +219,13 @@ let g:UltiSnipsEditSplit="vertical"
 
 " }}}
 " Colorscheme {{{
-if filereadable(expand("~/.vimrc_background"))
-  let base16colorspace=256
-  source ~/.vimrc_background
-  hi StatusLine ctermbg=18
-endif
+" if filereadable(expand("~/.vimrc_background"))
+"   let base16colorspace=256
+"   source ~/.vimrc_background
+"   hi StatusLine ctermbg=18
+" endif
+set background=dark
+colorscheme solarized
 " }}}
 " Autogroups {{{
 augroup Help
