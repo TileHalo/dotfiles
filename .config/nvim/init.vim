@@ -159,6 +159,7 @@ let g:deoplete#keyword_patterns = {}
 let g:deoplete#keyword_patterns.clojure = '[\w!$%&*+/:<=>?@\^_~\-\.#]*'
 " }}}
 " Go {{{
+let g:go_fmt_command = "goimports"
 " }}}
 " GHC {{{
 let g:necoghc_enable_detailed_browse=1
