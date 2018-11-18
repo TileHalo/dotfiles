@@ -43,7 +43,6 @@ set smartcase
 " Basic keybindings {{{
 
 nnoremap <leader><leader> :nohlsearch<CR>
-nnoremap <tab> /
 nnoremap <s-tab> ?
 inoremap <c-c> <Esc>
 
@@ -93,6 +92,15 @@ if dein#load_state('~/.cache/dein')
   " Rust
   call dein#add('rust-lang/rust.vim')
 
+  " Scala
+  call dein#add('ensime/ensime-vim')
+  call dein#add('derekwyatt/vim-scala')
+  call dein#add('derekwyatt/vim-sbt')
+  call dein#add('ktvoelker/sbt-vim')
+
+  " Pug
+  call dein#add('digitaltoad/vim-pug')
+
   " Snippets
   call dein#add('SirVer/ultisnips')
   call dein#add('honza/vim-snippets')
@@ -117,7 +125,6 @@ if dein#load_state('~/.cache/dein')
 
   " Vimwiki
   call dein#add('vimwiki/vimwiki')
-  call dein#add('teranex/vimwiki-tasks')
 
   " Linter
   call dein#add('w0rp/ale')
@@ -215,7 +222,6 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 let g:UltiSnipsEditSplit="vertical"
 
 " }}}
-
 " }}}
 " Colorscheme {{{
 " if filereadable(expand("~/.vimrc_background"))
