@@ -4,10 +4,13 @@
 let mapleader=" "
 
 " This thing is slightly bugged
-cnoremap W w !sudo tee > /dev/null %
+if !has('nvim')
+  cnoremap W w !sudo tee > /dev/null %
+endif
 
 set encoding=utf8
 set autoread
+set scrolloff=10
 
 nnoremap <leader>w :w<CR>
 
@@ -22,6 +25,17 @@ set backupdir=~/.vim/tmp
 
 " Swap file
 set directory=~/.vim/swap/
+
+
+" Setting up ignores
+set wildignore+=*/tmp/*,*.so,*.pyc,*.png,*.jpg,*.gif,*.jpeg,*.ico,*.pdf
+set wildignore+=*.wav,*.mp4,*.mp3
+set wildignore+=*.o,*.out,*.obj,.git,*.rbc,*.rbo,*.class,.svn,*.gem
+set wildignore+=*.zip,*.tar.gz,*.tar.bz2,*.rar,*.tar.xz
+set wildignore+=*/vendor/gems/*,*/vendor/cache/*,*/.bundle/*,*/.sass-cache/*
+set wildignore+=*.swp,*~,._*
+set wildignore+=_pycache_,.DS_Store,.vscode,.localized
+set wildignore+=.cache,node_modules,package-lock.json,yarn.lock,dist,.git,Cargo.lock
 " }}}
 " Basic UI {{{
 set number
@@ -74,16 +88,9 @@ if dein#load_state('~/.cache/dein')
   endif
   " And its sources
   call dein#add('Shougo/neco-syntax')
-  call dein#add('zchee/deoplete-clang')
-  call dein#add('clojure-vim/async-clj-omni')
-  call dein#add('zchee/deoplete-go', {'build': 'make'})
-  call dein#add('eagletmt/neco-ghc', {'build': 'cabal install ghc-mod'})
-  call dein#add('carlitux/deoplete-ternjs', { 'build': 'npm install -g tern' })
   call dein#add('Shougo/neco-vim')
-  call dein#add('phpactor/phpactor', {'build': 'composer install', 'for': 'php'})
-  call dein#add('kristijanhusak/deoplete-phpactor')
-  call dein#add('zchee/deoplete-jedi')
-  call dein#add('racer-rust/vim-racer')
+  call dein#add('autozimu/LanguageClient-neovim', {'rev': 'next',
+        \ 'build': 'bash install.sh'}, )
 
   " Languages
   " Golang
@@ -132,6 +139,10 @@ if dein#load_state('~/.cache/dein')
   " Colourscheme
   call dein#add('altercation/vim-colors-solarized')
 
+  " Git
+  call dein#add('tpope/vim-fugitive')
+  call dein#add('airblade/vim-gitgutter')
+
   call dein#end()
   call dein#save_state()
 endif
@@ -143,6 +154,16 @@ syntax enable
 " Denite {{{
 call denite#custom#var('file_rec', 'command',
 \ ['rg', '--files', '--glob', '!.git'])
+
+call denite#custom#map('insert', 
+      \ '<C-k>', 
+      \ '<denite:move_to_previous_line>', 
+      \ 'noremap')  
+
+call denite#custom#map('insert', 
+      \ '<C-j>', 
+      \ '<denite:move_to_next_line>', 
+      \ 'noremap')  
 
 nnoremap <leader>d :Denite
 nnoremap <leader>db :Denite buffer<cr>
@@ -166,42 +187,43 @@ nnoremap <leader>dr :Denite register<cr>
 nnoremap <leader>dt :Denite tag<cr>
 " }}}
 " Deoplete {{{
-" clang {{{
-let g:deoplete#sources#clang#libclang_path='/usr/lib/llvm-3.8/lib/libclang.so'
-let g:deoplete#sources#clang#clang_header='/usr/lib/llvm-3.8/lib/clang'
-" }}}
-" clojure {{{
-let g:deoplete#keyword_patterns = {}
-let g:deoplete#keyword_patterns.clojure = '[\w!$%&*+/:<=>?@\^_~\-\.#]*'
-" }}}
-" Go {{{
-" }}}
-" GHC {{{
-let g:necoghc_enable_detailed_browse=1
-" }}}
-" JS {{{
-" }}}
-" neco-vim {{{
-" }}}
-" phpactor {{{
-" }}}
-" jedi {{{
-let g:python3_host_prog = '/usr/bin/python3'
-" }}}
-" Rust {{{
-" let g:deoplete#sources#rust#racer_binary='/home/leo/.cargo/bin/racer'
-let g:racer_cmd = "/home/leo/.cargo/bin/racer"
-let g:deoplete#sources#rust#rust_source_path=system('echo `rustc --print sysroot`/lib/rustlib/src/rust/src')
+" Language Client {{{
+let g:LanguageClient_serverCommands = {
+  \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
+  \ 'go': ['/home/leo/go/bin//go-langserver'],
+  \ 'javascript': ['/home/leo/.nvm/version/node/v11.2.0/bin/javascript-typescript-stdio'],
+  \ 'cpp': ['cquery', '--log-file=/tmp/cq.log'],
+  \ 'c': ['cquery', '--log-file=/tmp/cq.log'],
+  \ 'python': ['/usr/local/bin/pyls'],
+  \ 'ruby': ['/usr/local/bin/solargraph stdio']
+\ }
 
-augroup RUST
-  au FileType rust nmap gd <Plug>(rust-def)
-  au FileType rust nmap gs <Plug>(rust-def-split)
-  au FileType rust nmap gx <Plug>(rust-def-vertical)
-  au FileType rust nmap <leader>gd <Plug>(rust-doc)
-augroup END
+function! EnableLC()
+  let lckeys = keys(g:LanguageClient_serverCommands)
+  for key in lckeys
+    if key == &filetype
+      call LC_maps()
+    endif
+  endfor
+endfunction
 
-" General Rust
-let g:rustfmt_autosave = 1
+function! LC_maps()
+  if has_key(g:LanguageClient_serverCommands, &filetype)
+    
+    nnoremap <F5> :call LanguageClient_contextMenu()<CR>
+
+    nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
+    nnoremap <buffer> <silent> gr :call LanguageClient#textDocument_rename()<CR>
+    nnoremap <buffer> <silent> <leader>gd :call LanguageClient#textDocument_hover()<CR>
+    nnoremap <buffer> <silent> gt :call LanguageClient#textDocument_typeDefinition()<CR>
+    nnoremap <buffer> <silent> <leader>gf :call LanguageClient#textDocument_formatting()<CR>
+    nnoremap <buffer> <silent> gff :call LanguageClient#textDocument_rangeFormatting()<CR>
+
+    nnoremap <buffer> <silent> <leader>gr :Denite references<CR>
+    nnoremap <buffer> <silent> <leader>gs :Denite documentSymbol<CR>
+  endif
+endfunction
+
 " }}}
 let g:deoplete#enable_at_startup=1
 " }}}
@@ -221,22 +243,56 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
 
+let g:UltiSnipsSnippetDirectories = ['~/.config/nvim/UltiSnips', 'UltiSnips']
+
 " }}}
 " }}}
-" Colorscheme {{{
-" if filereadable(expand("~/.vimrc_background"))
-"   let base16colorspace=256
-"   source ~/.vimrc_background
-"   hi StatusLine ctermbg=18
-" endif
+" Colours {{{
+
+" Colourscheme
 set background=dark
 colorscheme solarized
+" Statusline 
+
+set laststatus=2
+
+function! GitHead()
+  let git = fugitive#head()
+  if git != ''
+    return ' :: ' . git 
+  else
+    return ''
+  endif
+endfunction
+
+function! Modified()
+  if &mod == 1
+    return ' :: [+] '
+  else
+    return ''
+  endif
+endfunction
+
+set statusline=
+set statusline+=\ \ <\ %f%{Modified()}%{GitHead()}\ ::\ %y>
+" switching to right side
+set statusline+=%=
+set statusline+=<\ %n\ ::\ %l\ ::\ %L\ >
+
+hi! StatusLine ctermfg=0
+hi! StatusLine ctermbg=1
+
+hi! StatusLineNC ctermfg=0
+hi! StatusLineNC ctermbg=02
+
+" Separator
+hi VertSplit ctermfg=1
+hi VertSplit ctermbg=235
 " }}}
 " Autogroups {{{
 augroup Help
   autocmd FileType help wincmd L
+  autocmd FileType * call EnableLC()
 augroup END
 "  }}}
-
- 
 " vim:foldmethod=marker:foldlevel=0:expandtab:shiftwidth=2:cc=81
