@@ -25,7 +25,7 @@ set backupdir=~/.vim/tmp
 
 " Swap file
 set directory=~/.vim/swap/
-
+set completeopt-=preview
 
 " Setting up ignores
 set wildignore+=*/tmp/*,*.so,*.pyc,*.png,*.jpg,*.gif,*.jpeg,*.ico,*.pdf
@@ -88,13 +88,16 @@ if dein#load_state('~/.cache/dein')
   endif
   " And its sources
   call dein#add('Shougo/neco-syntax')
+  call dein#add('Shougo/neoinclude.vim')
   call dein#add('Shougo/neco-vim')
   call dein#add('autozimu/LanguageClient-neovim', {'rev': 'next',
         \ 'build': 'bash install.sh'}, )
+  call dein#add('Shougo/deoplete-clangx')
 
   " Languages
   " Golang
   call dein#add('fatih/vim-go', {'build': ':GoUpdateBinaries'})
+  call dein#add('zchee/deoplete-go', {'build': ':!go get -u github.com/mdempsky/gocode'})
 
   " Rust
   call dein#add('rust-lang/rust.vim')
@@ -105,6 +108,11 @@ if dein#load_state('~/.cache/dein')
   call dein#add('derekwyatt/vim-sbt')
   call dein#add('ktvoelker/sbt-vim')
 
+  " C/C++
+
+  " HTML
+  call dein#add('mattn/emmet-vim')
+
   " Pug
   call dein#add('digitaltoad/vim-pug')
 
@@ -114,6 +122,9 @@ if dein#load_state('~/.cache/dein')
 
   " Commenting
   call dein#add('tpope/vim-commentary')
+
+  " Surrounding
+  call dein#add('tpope/vim-surround')
   
   " User interface
   call dein#add('chriskempson/base16-vim')
@@ -190,10 +201,7 @@ nnoremap <leader>dt :Denite tag<cr>
 " Language Client {{{
 let g:LanguageClient_serverCommands = {
   \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
-  \ 'go': ['/home/leo/go/bin//go-langserver'],
   \ 'javascript': ['/home/leo/.nvm/version/node/v11.2.0/bin/javascript-typescript-stdio'],
-  \ 'cpp': ['cquery', '--log-file=/tmp/cq.log'],
-  \ 'c': ['cquery', '--log-file=/tmp/cq.log'],
   \ 'python': ['/usr/local/bin/pyls'],
   \ 'ruby': ['/usr/local/bin/solargraph stdio']
 \ }
@@ -224,13 +232,22 @@ function! LC_maps()
   endif
 endfunction
 
+
 " }}}
+call deoplete#custom#var('clangx', 'clang_binary', '/usr/bin/clang')
+
 let g:deoplete#enable_at_startup=1
+" }}}
+" Vim-go {{{
+let g:go_fmt_command = "goimports"
 " }}}
 " Neomake {{{
 call neomake#configure#automake('w')
 " }}}
 " gen_tags {{{
+let g:gen_tags#gtags_auto_gen = 1
+let g:gen_tags#gtags_default_map = 1
+
 " }}}
 " fakeclip {{{
 let g:vim_fakeclip_tmux_plus=1 
