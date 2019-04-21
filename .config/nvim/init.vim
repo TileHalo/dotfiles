@@ -3,16 +3,16 @@
 " Basic config {{{
 let mapleader=" "
 
-" This thing is slightly bugged
+" This thing is bugged in neovim. Use sudoedit command
 if !has('nvim')
   cnoremap W w !sudo tee > /dev/null %
 endif
 
 set encoding=utf8
 set autoread
-set scrolloff=10
-
-nnoremap <leader>w :w<CR>
+set scrolloff=5
+set hidden
+runtime macros/matchit.vim
 
 " Persistent undo
 set undofile
@@ -26,6 +26,8 @@ set backupdir=~/.vim/tmp
 " Swap file
 set directory=~/.vim/swap/
 set completeopt-=preview
+set formatoptions-=l
+set textwidth=80
 
 " Setting up ignores
 set wildignore+=*/tmp/*,*.so,*.pyc,*.png,*.jpg,*.gif,*.jpeg,*.ico,*.pdf
@@ -36,6 +38,18 @@ set wildignore+=*/vendor/gems/*,*/vendor/cache/*,*/.bundle/*,*/.sass-cache/*
 set wildignore+=*.swp,*~,._*
 set wildignore+=_pycache_,.DS_Store,.vscode,.localized
 set wildignore+=.cache,node_modules,package-lock.json,yarn.lock,dist,.git,Cargo.lock
+
+if executable('/usr/local/bin/python3.7')
+  let g:python3_host_prog = '/usr/local/bin/python3.7'
+elseif executable('python3.7')
+  let g:python3_host_prog='python3.7'
+elseif has('nvim')
+  echo "Missing python 3.7. Neovim won't work normally"
+endif
+
+if executable('rg')
+  set grepprg=rg\ --vimgrep\ --noheading\ --smart-case
+endif
 " }}}
 " Basic UI {{{
 set number
@@ -57,8 +71,6 @@ set smartcase
 " Basic keybindings {{{
 
 nnoremap <leader><leader> :nohlsearch<CR>
-nnoremap <s-tab> ?
-inoremap <c-c> <Esc>
 
 map <leader>tn :tabnew<cr>
 map <leader>to :tabonly<cr>
@@ -126,17 +138,11 @@ if dein#load_state('~/.cache/dein')
   " Surrounding
   call dein#add('tpope/vim-surround')
   
-  " User interface
-  call dein#add('chriskempson/base16-vim')
-
   " Builder
   call dein#add('neomake/neomake')
 
   " Tag generation
   call dein#add('jsfaint/gen_tags.vim')
-
-  " Better clipboard
-  call dein#add('cazador481/fakeclip.neovim')
 
   " Tmux
   call dein#add('ericpruitt/tmux.vim', {'rtp': 'vim/'})
@@ -153,6 +159,10 @@ if dein#load_state('~/.cache/dein')
   " Git
   call dein#add('tpope/vim-fugitive')
   call dein#add('airblade/vim-gitgutter')
+
+  " Distraction free writing
+  call dein#add('junegunn/goyo.vim')
+  call dein#add('junegunn/limelight.vim')
 
   call dein#end()
   call dein#save_state()
@@ -240,6 +250,8 @@ let g:deoplete#enable_at_startup=1
 " }}}
 " Vim-go {{{
 let g:go_fmt_command = "goimports"
+let g:go_fmt_fail_silently = 1
+
 " }}}
 " Neomake {{{
 call neomake#configure#automake('w')
@@ -263,6 +275,31 @@ let g:UltiSnipsEditSplit="vertical"
 let g:UltiSnipsSnippetDirectories = ['~/.config/nvim/UltiSnips', 'UltiSnips']
 
 " }}}
+" Goyo {{{
+function! s:goyo_enter()
+  silent !tmux set status off
+  silent !tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z
+  set noshowmode
+  set noshowcmd
+  set scrolloff=999
+  Limelight
+  set spell
+endfunc"ion
+
+function! s:goyo_leave()
+  silent !tmux set status on
+  silent !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
+  set showmode
+  set showcmd
+  set scrolloff=5
+  Limelight!
+  call SetStatus()
+endfunction
+" }}}
+" Limelight {{{
+let g:limelight_conceal_ctermfg = 245  " Solarized Base1
+let g:limelight_conceal_guifg = '#8a8a8a'  " Solarized Base1
+" }}}
 " }}}
 " Colours {{{
 
@@ -271,7 +308,6 @@ set background=dark
 colorscheme solarized
 " Statusline 
 
-set laststatus=2
 
 function! GitHead()
   let git = fugitive#head()
@@ -290,26 +326,38 @@ function! Modified()
   endif
 endfunction
 
-set statusline=
-set statusline+=\ \ <\ %f%{Modified()}%{GitHead()}\ ::\ %y>
-" switching to right side
-set statusline+=%=
-set statusline+=<\ %n\ ::\ %l\ ::\ %L\ >
+function! SetStatus()
+  set laststatus=2
+  set statusline=
+  set statusline+=\ \ <\ %f%{Modified()}%{GitHead()}\ ::\ %y>
+  " switching to right side
+  set statusline+=%=
+  set statusline+=<\ %n\ ::\ %l\ ::\ %L\ >
 
-hi! StatusLine ctermfg=0
-hi! StatusLine ctermbg=1
+  hi! StatusLine ctermfg=0
+  hi! StatusLine ctermbg=1
 
-hi! StatusLineNC ctermfg=0
-hi! StatusLineNC ctermbg=02
+  hi! StatusLineNC ctermfg=0
+  hi! StatusLineNC ctermbg=02
 
-" Separator
-hi VertSplit ctermfg=1
-hi VertSplit ctermbg=235
+  " Separator
+  hi VertSplit ctermfg=1
+  hi VertSplit ctermbg=235
+endfunction
+
+call SetStatus()
 " }}}
 " Autogroups {{{
 augroup Help
   autocmd FileType help wincmd L
   autocmd FileType * call EnableLC()
 augroup END
+augroup GOYO
+  autocmd! User GoyoEnter nested call <SID>goyo_enter()
+  autocmd! User GoyoLeave nested call <SID>goyo_leave()
+augroup END
+"  }}}
+"  Spelling {{{
+set spelllang="en_gb"
 "  }}}
 " vim:foldmethod=marker:foldlevel=0:expandtab:shiftwidth=2:cc=81
