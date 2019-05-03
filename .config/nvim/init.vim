@@ -1,4 +1,5 @@
 " VIMRC
+"
 " MAINTAINER: Leo Lahti <leo.lahti1@gmail.com>
 " Basic config {{{
 let mapleader=" "
@@ -10,7 +11,7 @@ endif
 
 set encoding=utf8
 set autoread
-set scrolloff=5
+set autowrite
 set hidden
 runtime macros/matchit.vim
 
@@ -25,9 +26,15 @@ set backupdir=~/.vim/tmp
 
 " Swap file
 set directory=~/.vim/swap/
-set completeopt-=preview
 set formatoptions-=l
 set textwidth=80
+
+" Ctags
+if executable('ctags')
+  set tags+=.git/tags,../.git/tags,../**/.git/tags
+  set tags+=.git/tags_dir/prj_tags,../.git/tags_dir/prj_tags,
+  set tags+=../**/.git/tags_dir/prj_tags
+endif
 
 " Setting up ignores
 set wildignore+=*/tmp/*,*.so,*.pyc,*.png,*.jpg,*.gif,*.jpeg,*.ico,*.pdf
@@ -48,11 +55,12 @@ elseif has('nvim')
 endif
 
 if executable('rg')
-  set grepprg=rg\ --vimgrep\ --noheading\ --smart-case
+  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
 endif
 " }}}
 " Basic UI {{{
 set number
+set relativenumber
 set showcmd
 set lazyredraw
 set cursorline
@@ -80,6 +88,11 @@ map <leader>t<leader> :tabnext <cr>
 
 map <leader>h :<C-u>split<CR>
 map <leader>v :<C-u>vsplit<CR>
+
+map <Left> :vertical resize -5<cr>
+map <Down> :resize +5<cr>
+map <Up> :resize -5<cr>
+map <Right> :vertical resize +5<cr>
 " }}}
 " Plugins {{{
 set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
@@ -89,38 +102,16 @@ if dein#load_state('~/.cache/dein')
 
   call dein#add('~/.cache/dein')
 
-  " Denite
-  call dein#add('Shougo/denite.nvim')
-
-  " Deoplete
-  call dein#add('Shougo/deoplete.nvim')
-  if !has('nvim')
-    call dein#add('roxma/nvim-yarp')
-    call dein#add('roxma/vim-hug-neovim-rpc')
-  endif
-  " And its sources
-  call dein#add('Shougo/neco-syntax')
-  call dein#add('Shougo/neoinclude.vim')
-  call dein#add('Shougo/neco-vim')
-  call dein#add('autozimu/LanguageClient-neovim', {'rev': 'next',
-        \ 'build': 'bash install.sh'}, )
-  call dein#add('Shougo/deoplete-clangx')
 
   " Languages
-  " Golang
-  call dein#add('fatih/vim-go', {'build': ':GoUpdateBinaries'})
-  call dein#add('zchee/deoplete-go', {'build': ':!go get -u github.com/mdempsky/gocode'})
 
   " Rust
   call dein#add('rust-lang/rust.vim')
 
   " Scala
-  call dein#add('ensime/ensime-vim')
   call dein#add('derekwyatt/vim-scala')
   call dein#add('derekwyatt/vim-sbt')
   call dein#add('ktvoelker/sbt-vim')
-
-  " C/C++
 
   " HTML
   call dein#add('mattn/emmet-vim')
@@ -138,9 +129,6 @@ if dein#load_state('~/.cache/dein')
   " Surrounding
   call dein#add('tpope/vim-surround')
   
-  " Builder
-  call dein#add('neomake/neomake')
-
   " Tag generation
   call dein#add('jsfaint/gen_tags.vim')
 
@@ -149,9 +137,6 @@ if dein#load_state('~/.cache/dein')
 
   " Vimwiki
   call dein#add('vimwiki/vimwiki')
-
-  " Linter
-  call dein#add('w0rp/ale')
 
   " Colourscheme
   call dein#add('altercation/vim-colors-solarized')
@@ -172,107 +157,21 @@ filetype plugin indent on
 syntax enable
 " }}}
 " And their configuration {{{
-" Denite {{{
-call denite#custom#var('file_rec', 'command',
-\ ['rg', '--files', '--glob', '!.git'])
 
-call denite#custom#map('insert', 
-      \ '<C-k>', 
-      \ '<denite:move_to_previous_line>', 
-      \ 'noremap')  
-
-call denite#custom#map('insert', 
-      \ '<C-j>', 
-      \ '<denite:move_to_next_line>', 
-      \ 'noremap')  
-
-nnoremap <leader>d :Denite
-nnoremap <leader>db :Denite buffer<cr>
-nnoremap <leader>dch :Denite change<cr>
-nnoremap <leader>dco :Denite colorscheme<cr>
-nnoremap <leader>dcm :Denite command<cr>
-nnoremap <leader>dcmh :Denite command_history<cr>
-nnoremap <leader>dd :Denite dein<cr>
-nnoremap <leader>ddr :Denite directory_rec<cr>
-nnoremap <leader>df :Denite file<cr>
-nnoremap <leader>dfo :Denite file_old<cr>
-nnoremap <leader>dfp :Denite file_point<cr>
-nnoremap <leader>dft :Denite filetype<cr>
-nnoremap <leader>dg :Denite grep<cr>
-nnoremap <leader>dh :Denite help<cr>
-nnoremap <leader>dj :Denite jump<cr>
-nnoremap <leader>dl :Denite line<cr>
-nnoremap <leader>dm :Denite menu<cr>
-nnoremap <leader>do :Denite outline<cr>
-nnoremap <leader>dr :Denite register<cr>
-nnoremap <leader>dt :Denite tag<cr>
-" }}}
-" Deoplete {{{
-" Language Client {{{
-let g:LanguageClient_serverCommands = {
-  \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
-  \ 'javascript': ['/home/leo/.nvm/version/node/v11.2.0/bin/javascript-typescript-stdio'],
-  \ 'python': ['/usr/local/bin/pyls'],
-  \ 'ruby': ['/usr/local/bin/solargraph stdio']
-\ }
-
-function! EnableLC()
-  let lckeys = keys(g:LanguageClient_serverCommands)
-  for key in lckeys
-    if key == &filetype
-      call LC_maps()
-    endif
-  endfor
-endfunction
-
-function! LC_maps()
-  if has_key(g:LanguageClient_serverCommands, &filetype)
-    
-    nnoremap <F5> :call LanguageClient_contextMenu()<CR>
-
-    nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
-    nnoremap <buffer> <silent> gr :call LanguageClient#textDocument_rename()<CR>
-    nnoremap <buffer> <silent> <leader>gd :call LanguageClient#textDocument_hover()<CR>
-    nnoremap <buffer> <silent> gt :call LanguageClient#textDocument_typeDefinition()<CR>
-    nnoremap <buffer> <silent> <leader>gf :call LanguageClient#textDocument_formatting()<CR>
-    nnoremap <buffer> <silent> gff :call LanguageClient#textDocument_rangeFormatting()<CR>
-
-    nnoremap <buffer> <silent> <leader>gr :Denite references<CR>
-    nnoremap <buffer> <silent> <leader>gs :Denite documentSymbol<CR>
-  endif
-endfunction
-
-
-" }}}
-call deoplete#custom#var('clangx', 'clang_binary', '/usr/bin/clang')
-
-let g:deoplete#enable_at_startup=1
-" }}}
-" Vim-go {{{
-let g:go_fmt_command = "goimports"
-let g:go_fmt_fail_silently = 1
-
-" }}}
-" Neomake {{{
-call neomake#configure#automake('w')
-" }}}
 " gen_tags {{{
-let g:gen_tags#gtags_auto_gen = 1
-let g:gen_tags#gtags_default_map = 1
-
-" }}}
-" fakeclip {{{
-let g:vim_fakeclip_tmux_plus=1 
+let g:gen_tags#use_cache_dir=0
+let g:gen_tags#blacklist=['$HOME']
 " }}}
 " UltiSnips {{{
 let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnips="<c-x><c-h>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
 
-let g:UltiSnipsSnippetDirectories = ['~/.config/nvim/UltiSnips', 'UltiSnips']
+let g:UltiSnipsSnippetDirectories = ['~/.config/nvim/UltiSnips']
 
 " }}}
 " Goyo {{{
@@ -300,6 +199,12 @@ endfunction
 let g:limelight_conceal_ctermfg = 245  " Solarized Base1
 let g:limelight_conceal_guifg = '#8a8a8a'  " Solarized Base1
 " }}}
+" }}}
+" Completion {{{
+
+set omnifunc=syntaxcomplete#Complete
+set completeopt=menu,menuone,noinsert,
+set complete=.,w,b,u,i
 " }}}
 " Colours {{{
 
@@ -348,14 +253,28 @@ endfunction
 call SetStatus()
 " }}}
 " Autogroups {{{
-augroup Help
-  autocmd FileType help wincmd L
-  autocmd FileType * call EnableLC()
+
+augroup Goyo
+  autocmd!
+  autocmd User GoyoEnter nested call <SID>goyo_enter()
+  autocmd User GoyoLeave nested call <SID>goyo_leave()
 augroup END
-augroup GOYO
-  autocmd! User GoyoEnter nested call <SID>goyo_enter()
-  autocmd! User GoyoLeave nested call <SID>goyo_leave()
+
+augroup Ctags
+  autocmd!
+  autocmd FileType c,cpp,go 
+        \ autocmd BufWritePost <buffer> :GenCtags
 augroup END
+
+augroup Quickfix
+  autocmd!
+  autocmd QuickFixCmdPost cgetexpr cwindow
+  autocmd QuickFixCmdPost lgetexpr lwindow
+augroup END
+"  }}}
+"  Grepping {{{
+command! -nargs=+ -complete=file_in_path -bar Grep  cgetexpr system(&grepprg . ' ' . shellescape(<q-args>))
+command! -nargs=+ -complete=file_in_path -bar LGrep lgetexpr system(&grepprg . ' ' . shellescape(<q-args>))
 "  }}}
 "  Spelling {{{
 set spelllang="en_gb"
