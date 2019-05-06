@@ -89,69 +89,64 @@ map <leader>t<leader> :tabnext <cr>
 map <leader>h :<C-u>split<CR>
 map <leader>v :<C-u>vsplit<CR>
 
-map <Left> :vertical resize -5<cr>
-map <Down> :resize +5<cr>
-map <Up> :resize -5<cr>
-map <Right> :vertical resize +5<cr>
+map <Left> :vertical resize -1<cr>
+map <Down> :resize +1<cr>
+map <Up> :resize -1<cr>
+map <Right> :vertical resize +1<cr>
+
 " }}}
 " Plugins {{{
-set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
-
-if dein#load_state('~/.cache/dein')
-  call dein#begin('~/.cache/dein')
-
-  call dein#add('~/.cache/dein')
-
-
+if !has('nvim')
+  call plug#begin("~/.vim/plugged")
+else
+  call plug#begin("~/.local/share/nvim/plugged")
+endif
   " Languages
-
   " Rust
-  call dein#add('rust-lang/rust.vim')
+  Plug 'rust-lang/rust.vim'
 
   " Scala
-  call dein#add('derekwyatt/vim-scala')
-  call dein#add('derekwyatt/vim-sbt')
-  call dein#add('ktvoelker/sbt-vim')
+  Plug 'derekwyatt/vim-scala'
+  Plug 'derekwyatt/vim-sbt'
+  if has('python')
+    Plug 'ktvoelker/sbt-vim'
+  endif
 
   " HTML
-  call dein#add('mattn/emmet-vim')
+  Plug 'mattn/emmet-vim'
 
   " Pug
-  call dein#add('digitaltoad/vim-pug')
+  Plug 'digitaltoad/vim-pug'
 
   " Snippets
-  call dein#add('SirVer/ultisnips')
-  call dein#add('honza/vim-snippets')
+  Plug 'Shougo/neosnippet.vim'
+  Plug 'Shougo/neosnippet-snippets'
+  Plug 'honza/vim-snippets'
 
   " Commenting
-  call dein#add('tpope/vim-commentary')
+  Plug 'tpope/vim-commentary'
 
   " Surrounding
-  call dein#add('tpope/vim-surround')
+  Plug 'tpope/vim-surround'
   
   " Tag generation
-  call dein#add('jsfaint/gen_tags.vim')
-
-  " Tmux
-  call dein#add('ericpruitt/tmux.vim', {'rtp': 'vim/'})
+  Plug 'jsfaint/gen_tags.vim'
 
   " Vimwiki
-  call dein#add('vimwiki/vimwiki')
+  Plug 'vimwiki/vimwiki'
 
   " Colourscheme
-  call dein#add('altercation/vim-colors-solarized')
+  Plug 'altercation/vim-colors-solarized'
 
   " Git
-  call dein#add('tpope/vim-fugitive')
-  call dein#add('airblade/vim-gitgutter')
+  Plug 'tpope/vim-fugitive'
+  Plug 'airblade/vim-gitgutter'
 
   " Distraction free writing
-  call dein#add('junegunn/goyo.vim')
-  call dein#add('junegunn/limelight.vim')
+  Plug 'junegunn/goyo.vim'
+  Plug 'junegunn/limelight.vim'
 
-  call dein#end()
-  call dein#save_state()
-endif
+call plug#end()
 
 filetype plugin indent on
 syntax enable
@@ -162,16 +157,8 @@ syntax enable
 let g:gen_tags#use_cache_dir=0
 let g:gen_tags#blacklist=['$HOME']
 " }}}
-" UltiSnips {{{
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnips="<c-x><c-h>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+" Snippets {{{
 
-" If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
-
-let g:UltiSnipsSnippetDirectories = ['~/.config/nvim/UltiSnips']
 
 " }}}
 " Goyo {{{
@@ -279,4 +266,3 @@ command! -nargs=+ -complete=file_in_path -bar LGrep lgetexpr system(&grepprg . '
 "  Spelling {{{
 set spelllang="en_gb"
 "  }}}
-" vim:foldmethod=marker:foldlevel=0:expandtab:shiftwidth=2:cc=81
