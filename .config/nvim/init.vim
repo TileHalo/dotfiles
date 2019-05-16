@@ -96,6 +96,16 @@ map <Right> :vertical resize +1<cr>
 
 " }}}
 " Plugins {{{
+if empty(glob('~/.vim/autoload/plug.vim')) && has('nvim')
+  silent !curl -fLo ~/.local/share/nvim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+elseif empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 if !has('nvim')
   call plug#begin("~/.vim/plugged")
 else
@@ -108,29 +118,32 @@ endif
   " Scala
   Plug 'derekwyatt/vim-scala'
   Plug 'derekwyatt/vim-sbt'
-  if has('python')
+  if has('python') || has('python3')
     Plug 'ktvoelker/sbt-vim'
   endif
 
   " HTML
   Plug 'mattn/emmet-vim'
 
+  "SCSS
+  Plug 'cakebaker/scss-syntax.vim'
+
   " Pug
   Plug 'digitaltoad/vim-pug'
 
   " Snippets
-  Plug 'Shougo/neosnippet.vim'
-  Plug 'Shougo/neosnippet-snippets'
+  if has('python') || has('python3')
+    Plug 'sirver/ultisnips'
+  endif
   Plug 'honza/vim-snippets'
 
   " Commenting
   Plug 'tpope/vim-commentary'
 
-  " Surrounding
-  Plug 'tpope/vim-surround'
   
-  " Tag generation
+  " Tag generation and tagbar
   Plug 'jsfaint/gen_tags.vim'
+  Plug 'majutsushi/tagbar'
 
   " Vimwiki
   Plug 'vimwiki/vimwiki'
@@ -146,6 +159,14 @@ endif
   Plug 'junegunn/goyo.vim'
   Plug 'junegunn/limelight.vim'
 
+  " Editorconfig
+  Plug 'editorconfig/editorconfig-vim'
+
+  " Surrounding etc.
+  Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-apathy'
+  Plug 'tpope/vim-unimpaired'
+
 call plug#end()
 
 filetype plugin indent on
@@ -157,9 +178,15 @@ syntax enable
 let g:gen_tags#use_cache_dir=0
 let g:gen_tags#blacklist=['$HOME']
 " }}}
+" Tagbar {{{
+nnoremap <leader>nj :TagbarToggle<cr>
+" }}}
 " Snippets {{{
-
-
+let g:UltiSnipsExpandTrigger="<c-k>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+let g:UltiSnipsListSnippets="<c-x><c-m>"
+let g:UltiSnipsEditSplit="vertical"
 " }}}
 " Goyo {{{
 function! s:goyo_enter()
@@ -170,7 +197,7 @@ function! s:goyo_enter()
   set scrolloff=999
   Limelight
   set spell
-endfunc"ion
+endfunction
 
 function! s:goyo_leave()
   silent !tmux set status on
@@ -192,6 +219,15 @@ let g:limelight_conceal_guifg = '#8a8a8a'  " Solarized Base1
 set omnifunc=syntaxcomplete#Complete
 set completeopt=menu,menuone,noinsert,
 set complete=.,w,b,u,i
+" }}}
+" File browser {{{
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_browse_split = 4
+let g:netrw_altv = 1
+let g:netrw_winsize = 25
+
+nnoremap <leader>nk :Lexplore<cr>
 " }}}
 " Colours {{{
 
@@ -247,11 +283,6 @@ augroup Goyo
   autocmd User GoyoLeave nested call <SID>goyo_leave()
 augroup END
 
-augroup Ctags
-  autocmd!
-  autocmd FileType c,cpp,go 
-        \ autocmd BufWritePost <buffer> :GenCtags
-augroup END
 
 augroup Quickfix
   autocmd!

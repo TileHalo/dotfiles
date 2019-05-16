@@ -1,25 +1,15 @@
-# ~/.profile: executed by the command interpreter for login shells.
-# This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
-# exists.
-# see /usr/share/doc/bash/examples/startup-files for examples.
-# the files are located in the bash-doc package.
+alias -t config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
-# the default umask is set in /etc/profile; for setting the umask
-# for ssh logins, install and configure the libpam-umask package.
-#umask 022
+GOPATH="$HOME/go"
+PATH="/usr/local/go/bin/:$HOME/.cargo/bin:/opt/CodeSourcery/arm-2009q1/bin/:$HOME/go/bin/:$PATH"
+PATH="/home/leo/.nvm/:$PATH"
+TERM="xterm-256color"
+PATH="$HOME/.rbenv/bin:$PATH"
 
-# if running bash
-# Base16 Shell
-BASE16_SHELL="$HOME/.config/base16-shell/"
-[ -n "$PS1" ] && \
-    [ -s "$BASE16_SHELL/profile_helper.sh" ] && \
-    	 eval "$("$BASE16_SHELL/profile_helper.sh")"
+NVM_DIR="$HOME/.nvm"
 
-alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
-
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
+HOST=`hostname`
+PS1="[ ${HOST} :: ${USER} ] "
+export PS1 NVM_DIR GOPATH PATH TERM
+eval "$(rbenv init -)"
+. "$NVM_DIR/nvm.sh" # This loads nvm
