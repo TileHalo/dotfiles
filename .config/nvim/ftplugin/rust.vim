@@ -1,4 +1,4 @@
-set makeprg=Cargo\ build
+set makeprg=cargo\ build
 set formatprg=rustfmt
 
 if executable('ctags')

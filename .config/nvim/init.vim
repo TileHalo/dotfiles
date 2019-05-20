@@ -96,11 +96,11 @@ map <Right> :vertical resize +1<cr>
 
 " }}}
 " Plugins {{{
-if empty(glob('~/.vim/autoload/plug.vim')) && has('nvim')
+if empty(glob('~/.local/share/nvim/plugged')) && has('nvim')
   silent !curl -fLo ~/.local/share/nvim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-elseif empty(glob('~/.vim/autoload/plug.vim'))
+elseif empty(glob('~/.vim/autoload/plug.vim')) && !has('nvim')
   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
@@ -115,12 +115,32 @@ endif
   " Rust
   Plug 'rust-lang/rust.vim'
 
+  " Vue
+
+  Plug 'posva/vim-vue'
+
   " Scala
   Plug 'derekwyatt/vim-scala'
   Plug 'derekwyatt/vim-sbt'
   if has('python') || has('python3')
     Plug 'ktvoelker/sbt-vim'
   endif
+
+  " Completion
+  Plug 'ncm2/ncm2' | Plug 'roxma/nvim-yarp'
+
+  Plug 'ncm2/ncm2-bufword'
+  Plug 'ncm2/ncm2-path'
+  Plug 'ncm2/ncm2-syntax' | Plug 'Shougo/neco-syntax'
+  Plug 'ncm2/ncm2-neoinclude' | Plug 'Shougo/neoinclude.vim'
+  Plug 'ncm2/ncm2-vim' | Plug 'Shougo/neco-vim'
+
+  Plug 'ncm2/ncm2-ultisnips'
+  Plug 'ncm2/ncm2-html-subscope'
+  Plug 'autozimu/LanguageClient-neovim', {
+  \ 'branch': 'next',
+  \ 'do': 'bash install.sh',
+  \ }
 
   " HTML
   Plug 'mattn/emmet-vim'
@@ -139,11 +159,9 @@ endif
 
   " Commenting
   Plug 'tpope/vim-commentary'
-
   
   " Tag generation and tagbar
   Plug 'jsfaint/gen_tags.vim'
-  Plug 'majutsushi/tagbar'
 
   " Vimwiki
   Plug 'vimwiki/vimwiki'
@@ -166,6 +184,9 @@ endif
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-apathy'
   Plug 'tpope/vim-unimpaired'
+
+  " Markdown
+  Plug 'mzlogin/vim-markdown-toc'
 
 call plug#end()
 
@@ -213,12 +234,18 @@ endfunction
 let g:limelight_conceal_ctermfg = 245  " Solarized Base1
 let g:limelight_conceal_guifg = '#8a8a8a'  " Solarized Base1
 " }}}
+" Markdown {{{
+
+" }}}
 " }}}
 " Completion {{{
 
-set omnifunc=syntaxcomplete#Complete
-set completeopt=menu,menuone,noinsert,
-set complete=.,w,b,u,i
+augroup Completion
+  autocmd!
+  autocmd BufEnter  *  call ncm2#enable_for_buffer()
+augroup END
+
+set completeopt=noinsert,menuone,noselect
 " }}}
 " File browser {{{
 let g:netrw_banner = 0

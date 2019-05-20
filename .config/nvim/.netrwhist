@@ -1,0 +1,7 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =5
+let g:netrw_dirhist_1='/home/leo/code/tupa/migrations/2019-03-24-095546_create_syote'
+let g:netrw_dirhist_2='/home/leo/code/tupa/migrations/2019-03-24-095550_create_tulos'
+let g:netrw_dirhist_3='/home/leo/code/tupa/migrations/2019-03-24-095554_create_vartio'
+let g:netrw_dirhist_4='/home/leo/.config/nvim/ftplugin'
+let g:netrw_dirhist_5='/home/leo'
