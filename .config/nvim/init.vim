@@ -45,8 +45,9 @@ set wildignore+=*/vendor/gems/*,*/vendor/cache/*,*/.bundle/*,*/.sass-cache/*
 set wildignore+=*.swp,*~,._*
 set wildignore+=_pycache_,.DS_Store,.vscode,.localized
 set wildignore+=.cache,node_modules,package-lock.json,yarn.lock,dist,.git,Cargo.lock
-
-if executable('/usr/local/bin/python3.7')
+if executable('/usr/bin/python3.6')
+  let g:python3_host_prog = '/usr/bin/python3.6'
+elseif executable('/usr/local/bin/python3.7')
   let g:python3_host_prog = '/usr/local/bin/python3.7'
 elseif executable('python3.7')
   let g:python3_host_prog='python3.7'
@@ -237,6 +238,15 @@ let g:limelight_conceal_guifg = '#8a8a8a'  " Solarized Base1
 " Markdown {{{
 
 " }}}
+" Language servers {{{
+let g:LanguageClient_serverCommands = {
+  \ 'vue': ['vls'],
+  \ 'javascript': ['javascript-typescript-stdio'],
+  \ 'rust': ['~/.cargo/bin/rustp', 'run', 'stable', 'rls'],
+  \ 'scala' ['metals-vim'],
+  \ 'go': ['go-langserver']
+  \ }
+" }}}
 " }}}
 " Completion {{{
 
@@ -265,6 +275,9 @@ colorscheme solarized
 
 
 function! GitHead()
+  if !(exists('fugitive#head'))
+    return ''
+  endif
   let git = fugitive#head()
   if git != ''
     return ' :: ' . git 
@@ -324,3 +337,4 @@ command! -nargs=+ -complete=file_in_path -bar LGrep lgetexpr system(&grepprg . '
 "  Spelling {{{
 set spelllang="en_gb"
 "  }}}
+
