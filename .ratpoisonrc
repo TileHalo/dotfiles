@@ -1,0 +1,56 @@
+exec xsetroot -cursor_name left_ptr
+# exec xrandr --output DVI-D-1 --right-of HDMI-1
+startup_message off
+
+unbind c
+unbind 0
+unbind 1
+unbind 2
+unbind 3
+unbind 4
+unbind 5
+unbind 6
+unbind 7
+unbind 8
+unbind 9
+
+bind Return exec urxvt
+bind C-Return exec urxvt
+bind f exec firefox-bin
+escape C-b
+
+bind ampersand select 1
+bind bracketleft select 2
+bind braceleft select 3
+bind braceright select 4
+bind parenleft select 5
+bind equal select 6
+bind asterisk select 7
+bind parenright select 8
+bind plus select 9
+bind bracketright select 0
+
+bind h focusleft 
+bind j focusdow 
+bind k focusup 
+bind l focusright
+
+bind comma prevscreen
+bind period nextscreen
+
+bind q quit
+bind d delete
+bind c delete
+
+gnewbg one
+gnewbg two
+gnewbg three
+gnewbg four
+gnewbg five
+gnewbg six
+
+definekey top M-l exec ratpoison -c "select -" -c "gprev" -c "next"
+definekey top M-h exec ratpoison -c "select -" -c "gnext" -c "next"
+
+
+set border 0
