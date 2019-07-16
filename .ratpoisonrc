@@ -1,5 +1,4 @@
 exec xsetroot -cursor_name left_ptr
-# exec xrandr --output DVI-D-1 --right-of HDMI-1
 startup_message off
 
 unbind c
@@ -16,7 +15,7 @@ unbind 9
 
 bind Return exec urxvt
 bind C-Return exec urxvt
-bind f exec firefox-bin
+bind f exec firefox
 escape C-b
 
 bind ampersand select 1
@@ -31,7 +30,7 @@ bind plus select 9
 bind bracketright select 0
 
 bind h focusleft 
-bind j focusdow 
+bind j focusdown
 bind k focusup 
 bind l focusright
 
@@ -39,18 +38,64 @@ bind comma prevscreen
 bind period nextscreen
 
 bind q quit
-bind d delete
 bind c delete
 
-gnewbg one
-gnewbg two
-gnewbg three
-gnewbg four
-gnewbg five
-gnewbg six
+bind o only
+bind u undo
+bind d dedicate
+bind g groups
 
-definekey top M-l exec ratpoison -c "select -" -c "gprev" -c "next"
-definekey top M-h exec ratpoison -c "select -" -c "gnext" -c "next"
+gnewbg terminal
+gnewbg firefox
+gnewbg mail
+gnewbg irc
+gnewbg dev
+gnewbg ssh
 
+definekey top M-h exec ratpoison -c "select -" -c "gprev" -c "next"
+definekey top M-l exec ratpoison -c "select -" -c "gnext" -c "next"
+
+definekey top M-ampersand exec ratpoison -c "select -" -c "gselect terminal" -c "next"
+definekey top M-bracketleft exec ratpoison -c "select -" -c "gselect firefox" -c "next"
+definekey top M-braceleft exec ratpoison -c "select -" -c "gselect mail" -c "next"
+definekey top M-braceright exec ratpoison -c "select -" -c "gselect irc" -c "next"
+definekey top M-parenleft exec ratpoison -c "select -" -c "gselect dev" -c "next"
+definekey top M-equal exec ratpoison -c "select -" -c "gselect ssh" -c "next"
+definekey top M-dollar exec ratpoison -c "select -" -c "gselect default" -c "next"
+
+definekey top M-percent exec ratpoison -c "gmove terminal" -c "select -" -c "next"
+definekey top M-7 exec ratpoison -c "gmove firefox" -c "select -" -c "next"
+definekey top M-5 exec ratpoison -c "gmove mail" -c "select -" -c "next"
+definekey top M-3 exec ratpoison -c "gmove irc" -c "select -" -c "next"
+definekey top M-1 exec ratpoison -c "gmove dev" -c "select -" -c "next"
+definekey top M-6 exec ratpoison -c "gmove ssh" -c "select -" -c "next"
+definekey top M-tilde exec ratpoison -c "gmove default" -c "select -" -c "next"
+
+definekey top M-Return exec urxvt -e -bash -c "tmux -q has-session && exec tmux
+attach-session -d || exec tmux new-session -n$USER -s$USER@$HOSTNAME"
+
+gselect firefox
+exec firefox
+
+gselect dev
+exec urxvt -e bash -c "tmux new-session -A -s development"
+
+gselect irc
+exec urxvt -e bash -c "tmux new-session -A -s irc"
+
+gselect mail
+exec urxvt -e bash -c "tmux new-session -A -s mail"
+
+gselect ssh
+exec urxvt -e bash -c "tmux new-session -A -s ssh"
+
+gselect terminal
+exec urxvt
+
+gselect default
+gmove firefox
+select -
+next
 
 set border 0
+set padding 0 0 0 0
