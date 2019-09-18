@@ -1,8 +1,8 @@
-alias -t config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 GOPATH="$HOME/go"
 PATH="/usr/local/go/bin/:$HOME/.cargo/bin:/opt/CodeSourcery/arm-2009q1/bin/:$HOME/go/bin/:$PATH"
-PATH="/home/leo/.nvm/:$PATH"
+PATH="/home/leo/.nvm/:$HOME/.local/bin/:$PATH"
 TERM="xterm-256color"
 PATH="$HOME/.rbenv/bin:$PATH"
 

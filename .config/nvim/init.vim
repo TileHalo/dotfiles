@@ -26,7 +26,6 @@ set backupdir=~/.vim/tmp
 
 " Swap file
 set directory=~/.vim/swap/
-set formatoptions-=l
 set textwidth=80
 
 " Ctags
@@ -135,6 +134,7 @@ endif
   Plug 'ncm2/ncm2-syntax' | Plug 'Shougo/neco-syntax'
   Plug 'ncm2/ncm2-neoinclude' | Plug 'Shougo/neoinclude.vim'
   Plug 'ncm2/ncm2-vim' | Plug 'Shougo/neco-vim'
+  Plug 'ncm2/ncm2-jedi'
 
   Plug 'ncm2/ncm2-ultisnips'
   Plug 'ncm2/ncm2-html-subscope'
@@ -148,6 +148,9 @@ endif
 
   "SCSS
   Plug 'cakebaker/scss-syntax.vim'
+  
+  " Haskell
+  Plug 'neovimhaskell/haskell-vim'
 
   " Pug
   Plug 'digitaltoad/vim-pug'
@@ -243,9 +246,15 @@ let g:LanguageClient_serverCommands = {
   \ 'vue': ['vls'],
   \ 'javascript': ['javascript-typescript-stdio'],
   \ 'rust': ['~/.cargo/bin/rustp', 'run', 'stable', 'rls'],
-  \ 'scala' ['metals-vim'],
-  \ 'go': ['go-langserver']
+  \ 'scala': ['metals-vim'],
+  \ 'go': ['go-langserver'],
   \ }
+
+
+nnoremap <F5> :call LanguageClient_contextMenu()<CR>
+nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
+nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
+nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
 " }}}
 " }}}
 " Completion {{{
