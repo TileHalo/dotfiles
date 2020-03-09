@@ -1,0 +1,29 @@
+snippet struct "New struct"
+/*! \struct $1
+ *
+ * $2
+ */
+typedef struct {
+	$3;
+} $1;
+endsnippet
+
+snippet union "New struct"
+/*! \union $1
+ *
+ * $2
+ */
+typedef union {
+	$3;
+} $1;
+endsnippet
+
+snippet enum "New struct"
+/*! \enum $1
+ *
+ * $2
+ */
+typedef enum {
+	$3;
+} $1;
+endsnippet
