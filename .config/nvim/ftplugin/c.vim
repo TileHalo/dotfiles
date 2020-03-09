@@ -1,6 +1,2 @@
-
-
-augroup Ctags
-  autocmd!
-  autocmd BufWritePost <buffer> :GenCtags
-augroup END
+set cinkeys-=0#
+set cinoptions=l1

@@ -1,19 +1,15 @@
 " VIMRC
-"
+
 " MAINTAINER: Leo Lahti <leo.lahti1@gmail.com>
 " Basic config {{{
-let mapleader=" "
-
-" This thing is bugged in neovim. Use sudoedit command
-if !has('nvim')
-  cnoremap W w !sudo tee > /dev/null %
-endif
-
 set encoding=utf8
 set autoread
 set autowrite
 set hidden
+set exrc
 runtime macros/matchit.vim
+
+let mapleader=" "
 
 " Persistent undo
 set undofile
@@ -26,13 +22,30 @@ set backupdir=~/.vim/tmp
 
 " Swap file
 set directory=~/.vim/swap/
-set textwidth=80
+set cc=80
 
-" Ctags
+" Ctags and Cscope
 if executable('ctags')
   set tags+=.git/tags,../.git/tags,../**/.git/tags
   set tags+=.git/tags_dir/prj_tags,../.git/tags_dir/prj_tags,
   set tags+=../**/.git/tags_dir/prj_tags
+endif
+
+if has('cscope')
+  set cscopetag cscopeverbose
+
+  if has('quickfix')
+    set cscopequickfix=s-,c-,d-,i-,t-,e-
+  endif
+
+  cnoreabbrev csa cs add
+  cnoreabbrev csf cs find
+  cnoreabbrev csk cs kill
+  cnoreabbrev csr cs reset
+  cnoreabbrev css cs show
+  cnoreabbrev csh cs help
+
+  command! -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
 endif
 
 " Setting up ignores
@@ -44,18 +57,20 @@ set wildignore+=*/vendor/gems/*,*/vendor/cache/*,*/.bundle/*,*/.sass-cache/*
 set wildignore+=*.swp,*~,._*
 set wildignore+=_pycache_,.DS_Store,.vscode,.localized
 set wildignore+=.cache,node_modules,package-lock.json,yarn.lock,dist,.git,Cargo.lock
-if executable('/usr/bin/python3.6')
-  let g:python3_host_prog = '/usr/bin/python3.6'
-elseif executable('/usr/local/bin/python3.7')
-  let g:python3_host_prog = '/usr/local/bin/python3.7'
-elseif executable('python3.7')
-  let g:python3_host_prog='python3.7'
-elseif has('nvim')
-  echo "Missing python 3.7. Neovim won't work normally"
-endif
 
 if executable('rg')
   set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+endif
+if has("python3")
+  python3 import vim; from sys import version_info as v; vim.command('let python_version=%d' % (v[0] * 100 + v[1]))
+else
+  let python_version=0
+endif
+
+if python_version < 307
+  echo printf("Neovim won't work properly %d", python_version)
+else
+  let g:python3_host_prog='python'
 endif
 " }}}
 " Basic UI {{{
@@ -66,6 +81,9 @@ set lazyredraw
 set cursorline
 set wildmenu
 set showmatch
+set backspace=indent,eol,start
+set breakindent
+set browsedir=buffer
 
 " }}}
 " Indent options {{{
@@ -80,20 +98,16 @@ set smartcase
 
 nnoremap <leader><leader> :nohlsearch<CR>
 
-map <leader>tn :tabnew<cr>
-map <leader>to :tabonly<cr>
-map <leader>tc :tabclose<cr>
-map <leader>tm :tabmove 
-map <leader>t<leader> :tabnext <cr>
-
-map <leader>h :<C-u>split<CR>
-map <leader>v :<C-u>vsplit<CR>
-
 map <Left> :vertical resize -1<cr>
 map <Down> :resize +1<cr>
 map <Up> :resize -1<cr>
 map <Right> :vertical resize +1<cr>
 
+vnoremap $( <esc>`>a)<esc>`<i(<esc>
+vnoremap $[ <esc>`>a]<esc>`<i[<esc>
+vnoremap ${ <esc>`>a}<esc>`<i{<esc>
+vnoremap $" <esc>`>a"<esc>`<i"<esc>
+vnoremap $' <esc>`>a'<esc>`<i'<esc>
 " }}}
 " Plugins {{{
 if empty(glob('~/.local/share/nvim/plugged')) && has('nvim')
@@ -111,160 +125,28 @@ if !has('nvim')
 else
   call plug#begin("~/.local/share/nvim/plugged")
 endif
-  " Languages
-  " Rust
-  Plug 'rust-lang/rust.vim'
-
-  " Vue
-
-  Plug 'posva/vim-vue'
-
-  " Scala
-  Plug 'derekwyatt/vim-scala'
-  Plug 'derekwyatt/vim-sbt'
-  if has('python') || has('python3')
-    Plug 'ktvoelker/sbt-vim'
-  endif
-
-  " Completion
-  Plug 'ncm2/ncm2' | Plug 'roxma/nvim-yarp'
-
-  Plug 'ncm2/ncm2-bufword'
-  Plug 'ncm2/ncm2-path'
-  Plug 'ncm2/ncm2-syntax' | Plug 'Shougo/neco-syntax'
-  Plug 'ncm2/ncm2-neoinclude' | Plug 'Shougo/neoinclude.vim'
-  Plug 'ncm2/ncm2-vim' | Plug 'Shougo/neco-vim'
-  Plug 'ncm2/ncm2-jedi'
-
-  Plug 'ncm2/ncm2-ultisnips'
-  Plug 'ncm2/ncm2-html-subscope'
-  Plug 'autozimu/LanguageClient-neovim', {
-  \ 'branch': 'next',
-  \ 'do': 'bash install.sh',
-  \ }
-
-  " HTML
-  Plug 'mattn/emmet-vim'
-
-  "SCSS
-  Plug 'cakebaker/scss-syntax.vim'
-  
-  " Haskell
-  Plug 'neovimhaskell/haskell-vim'
-
-  " Pug
-  Plug 'digitaltoad/vim-pug'
-
-  " Snippets
-  if has('python') || has('python3')
-    Plug 'sirver/ultisnips'
-  endif
-  Plug 'honza/vim-snippets'
-
-  " Commenting
   Plug 'tpope/vim-commentary'
-  
-  " Tag generation and tagbar
-  Plug 'jsfaint/gen_tags.vim'
-
-  " Vimwiki
-  Plug 'vimwiki/vimwiki'
-
-  " Colourscheme
-  Plug 'altercation/vim-colors-solarized'
-
-  " Git
   Plug 'tpope/vim-fugitive'
-  Plug 'airblade/vim-gitgutter'
-
-  " Distraction free writing
-  Plug 'junegunn/goyo.vim'
-  Plug 'junegunn/limelight.vim'
-
-  " Editorconfig
-  Plug 'editorconfig/editorconfig-vim'
-
-  " Surrounding etc.
   Plug 'tpope/vim-surround'
-  Plug 'tpope/vim-apathy'
+  Plug 'editorconfig/editorconfig-vim'
+  Plug 'tikhomirov/vim-glsl'
+  Plug 'tpope/vim-repeat'
   Plug 'tpope/vim-unimpaired'
+  Plug 'glts/vim-radical'
+  Plug 'glts/vim-magnum'
 
-  " Markdown
-  Plug 'mzlogin/vim-markdown-toc'
 
+  Plug 'lifepillar/vim-solarized8'
+  Plug 'altercation/vim-colors-solarized'
+  Plug 'tikhomirov/vim-glsl'
 call plug#end()
 
 filetype plugin indent on
 syntax enable
 " }}}
-" And their configuration {{{
-
-" gen_tags {{{
-let g:gen_tags#use_cache_dir=0
-let g:gen_tags#blacklist=['$HOME']
-" }}}
-" Tagbar {{{
-nnoremap <leader>nj :TagbarToggle<cr>
-" }}}
-" Snippets {{{
-let g:UltiSnipsExpandTrigger="<c-k>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-let g:UltiSnipsListSnippets="<c-x><c-m>"
-let g:UltiSnipsEditSplit="vertical"
-" }}}
-" Goyo {{{
-function! s:goyo_enter()
-  silent !tmux set status off
-  silent !tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z
-  set noshowmode
-  set noshowcmd
-  set scrolloff=999
-  Limelight
-  set spell
-endfunction
-
-function! s:goyo_leave()
-  silent !tmux set status on
-  silent !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
-  set showmode
-  set showcmd
-  set scrolloff=5
-  Limelight!
-  call SetStatus()
-endfunction
-" }}}
-" Limelight {{{
-let g:limelight_conceal_ctermfg = 245  " Solarized Base1
-let g:limelight_conceal_guifg = '#8a8a8a'  " Solarized Base1
-" }}}
-" Markdown {{{
-
-" }}}
-" Language servers {{{
-let g:LanguageClient_serverCommands = {
-  \ 'vue': ['vls'],
-  \ 'javascript': ['javascript-typescript-stdio'],
-  \ 'rust': ['~/.cargo/bin/rustp', 'run', 'stable', 'rls'],
-  \ 'scala': ['metals-vim'],
-  \ 'go': ['go-langserver'],
-  \ }
-
-
-nnoremap <F5> :call LanguageClient_contextMenu()<CR>
-nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
-nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
-nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-" }}}
-" }}}
 " Completion {{{
-
-augroup Completion
-  autocmd!
-  autocmd BufEnter  *  call ncm2#enable_for_buffer()
-augroup END
-
-set completeopt=noinsert,menuone,noselect
+set cpt+=i,d
+set omnifunc=syntaxcomplete#Complete
 " }}}
 " File browser {{{
 let g:netrw_banner = 0
@@ -279,7 +161,7 @@ nnoremap <leader>nk :Lexplore<cr>
 
 " Colourscheme
 set background=dark
-colorscheme solarized
+silent! colorscheme solarized
 " Statusline 
 
 
@@ -324,14 +206,9 @@ endfunction
 
 call SetStatus()
 " }}}
-" Autogroups {{{
-
-augroup Goyo
-  autocmd!
-  autocmd User GoyoEnter nested call <SID>goyo_enter()
-  autocmd User GoyoLeave nested call <SID>goyo_leave()
-augroup END
-
+"  Grepping {{{
+command! -nargs=+ -complete=file_in_path -bar Grep  cgetexpr system(&grepprg . ' ' . shellescape(<q-args>))
+command! -nargs=+ -complete=file_in_path -bar LGrep lgetexpr system(&grepprg . ' ' . shellescape(<q-args>))
 
 augroup Quickfix
   autocmd!
@@ -339,11 +216,9 @@ augroup Quickfix
   autocmd QuickFixCmdPost lgetexpr lwindow
 augroup END
 "  }}}
-"  Grepping {{{
-command! -nargs=+ -complete=file_in_path -bar Grep  cgetexpr system(&grepprg . ' ' . shellescape(<q-args>))
-command! -nargs=+ -complete=file_in_path -bar LGrep lgetexpr system(&grepprg . ' ' . shellescape(<q-args>))
-"  }}}
 "  Spelling {{{
 set spelllang="en_gb"
 "  }}}
+" Helpers {{{
 
+" }}}
