@@ -1,4 +1,4 @@
-set formatprg=prettier\ --no-config\ --stdin\ --parser=scss
-set expandtab
-set shiftwidth=2
-set tabstop=2
+setlocal formatprg=prettier\ --no-config\ --stdin\ --parser=scss
+setlocal expandtab
+setlocal shiftwidth=2
+setlocal tabstop=2

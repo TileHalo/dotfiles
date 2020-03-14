@@ -1,3 +1,3 @@
-set spell
-set spelllang=en_GB
-set spellfile="~/.spell/en_GB.dic"
+setlocal spell
+setlocal spelllang=en_GB
+setlocal spellfile="~/.spell/en_GB.dic"

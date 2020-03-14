@@ -1,1 +1,1 @@
-set formatprg=hindent
+setlocal formatprg=hindent

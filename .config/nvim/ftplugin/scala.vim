@@ -1,1 +1,1 @@
-set formatprg=scalafmt\ --stdin\ --stdout
+setlocal formatprg=scalafmt\ --stdin\ --stdout

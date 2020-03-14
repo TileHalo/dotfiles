@@ -1,10 +1,10 @@
-set formatprg=prettier\ --no-config\ --stdin\ --parser=babel
-set makeprg=eslint\ --format\ compact
+setlocal formatprg=prettier\ --no-config\ --stdin\ --parser=babel
+setlocal makeprg=eslint\ --format\ compact
 
-set expandtab
-set shiftwidth=2
-set tabstop=2
+setlocal expandtab
+setlocal shiftwidth=2
+setlocal tabstop=2
 
-set path=.,front/src/js/,src/
-setlocal suffixesadd+=.js
-setlocal include=^\\s*[^\/]\\+\\(from\\\|require(['\"]\\)
+setlocal path=.,front/src/js/,src/
+setlocallocal suffixesadd+=.js
+setlocallocal include=^\\s*[^\/]\\+\\(from\\\|require(['\"]\\)

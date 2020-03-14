@@ -1,5 +1,5 @@
-set foldmethod=marker
-set foldlevel=0
-set expandtab
-set shiftwidth=2
-set cc=81
+setlocal foldmethod=marker
+setlocal foldlevel=0
+setlocal expandtab
+setlocal shiftwidth=2
+setlocal cc=81

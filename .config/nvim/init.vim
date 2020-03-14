@@ -1,3 +1,4 @@
+
 " VIMRC
 
 " MAINTAINER: Leo Lahti <leo.lahti1@gmail.com>
@@ -10,6 +11,7 @@ set exrc
 runtime macros/matchit.vim
 
 let mapleader=" "
+let maplocalleader=","
 
 " Persistent undo
 set undofile
@@ -24,15 +26,11 @@ set backupdir=~/.vim/tmp
 set directory=~/.vim/swap/
 set cc=80
 
-" Ctags and Cscope
-if executable('ctags')
-  set tags+=.git/tags,../.git/tags,../**/.git/tags
-  set tags+=.git/tags_dir/prj_tags,../.git/tags_dir/prj_tags,
-  set tags+=../**/.git/tags_dir/prj_tags
-endif
 
+" Ctags and Cscope
 if has('cscope')
-  set cscopetag cscopeverbose
+  set cscopeverbose
+  set cscopetag
 
   if has('quickfix')
     set cscopequickfix=s-,c-,d-,i-,t-,e-
@@ -48,7 +46,12 @@ if has('cscope')
   command! -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
 endif
 
-" Setting up ignores
+if executable('ctags')
+  set nocscopetag
+endif
+
+" Setting up ignores and path
+set path+=**
 set wildignore+=*/tmp/*,*.so,*.pyc,*.png,*.jpg,*.gif,*.jpeg,*.ico,*.pdf
 set wildignore+=*.wav,*.mp4,*.mp3
 set wildignore+=*.o,*.out,*.obj,.git,*.rbc,*.rbo,*.class,.svn,*.gem
@@ -125,20 +128,39 @@ if !has('nvim')
 else
   call plug#begin("~/.local/share/nvim/plugged")
 endif
+  Plug 'altercation/vim-colors-solarized'
+  Plug 'editorconfig/editorconfig-vim'
+  Plug 'glts/vim-magnum'
+  Plug 'glts/vim-radical'
+  Plug 'tikhomirov/vim-glsl'
   Plug 'tpope/vim-commentary'
   Plug 'tpope/vim-fugitive'
-  Plug 'tpope/vim-surround'
-  Plug 'editorconfig/editorconfig-vim'
-  Plug 'tikhomirov/vim-glsl'
   Plug 'tpope/vim-repeat'
+  Plug 'tpope/vim-surround'
   Plug 'tpope/vim-unimpaired'
-  Plug 'glts/vim-radical'
-  Plug 'glts/vim-magnum'
-
-
-  Plug 'lifepillar/vim-solarized8'
-  Plug 'altercation/vim-colors-solarized'
-  Plug 'tikhomirov/vim-glsl'
+  Plug 'tpope/vim-abolish'
+  Plug 'tpope/vim-markdown'
+  Plug 'tpope/vim-obsession'
+  Plug 'tpope/vim-rails'
+  Plug 'tpope/vim-eunuch'
+  Plug 'tpope/vim-sexp-mappings-for-regular-people'
+  Plug 'tpope/vim-dadbod'
+  Plug 'tpope/vim-fireplace', {'for': 'clojure'}
+  Plug 'tpope/vim-haml'
+  Plug 'tpope/vim-sleuth'
+  Plug 'tpope/vim-dotenv'
+  Plug 'tpope/vim-jdaddy'
+  Plug 'tpope/vim-apathy'
+  Plug 'tpope/vim-rhubarb'
+  Plug 'tpope/vim-speeddating'
+  Plug 'tpope/vim-tbone'
+  Plug 'tpope/vim-projectionist'
+  Plug 'michaeljsmith/vim-indent-object'
+  Plug 'junegunn/vim-peekaboo'
+  Plug 'junegunn/goyo.vim'
+  Plug 'junegunn/limelight.vim'
+  Plug 'majutsushi/tagbar'
+  Plug 'sheerun/vim-polyglot'
 call plug#end()
 
 filetype plugin indent on
@@ -156,6 +178,7 @@ let g:netrw_altv = 1
 let g:netrw_winsize = 25
 
 nnoremap <leader>nk :Lexplore<cr>
+nnoremap <leader>tk :Tagbar<cr>
 " }}}
 " Colours {{{
 
@@ -221,4 +244,12 @@ set spelllang="en_gb"
 "  }}}
 " Helpers {{{
 
+" }}}
+" NetRW {{{
+let g:netrw_banner=0        " disable banner
+let g:netrw_browse_split=4  " open in prior window
+let g:netrw_altv=1          " open splits to the right
+let g:netrw_liststyle=3     " tree view
+let g:netrw_list_hide=netrw_gitignore#Hide()
+let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
 " }}}

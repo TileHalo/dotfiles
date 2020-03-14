@@ -1,2 +1,2 @@
-set cinkeys-=0#
-set cinoptions=l1
+setlocal cinkeys-=0#
+setlocal cinoptions=l1

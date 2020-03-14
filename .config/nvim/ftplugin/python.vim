@@ -1,4 +1,4 @@
-setlocal formatprg=autopep8\ -
-setlocal makeprg=flake8
+setlocallocal formatprg=autopep8\ -
+setlocallocal makeprg=flake8
 
 

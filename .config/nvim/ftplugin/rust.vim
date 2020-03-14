@@ -1,8 +1,8 @@
-set makeprg=cargo\ build
-set formatprg=rustfmt
+setlocal makeprg=cargo\ build
+setlocal formatprg=rustfmt
 
 if executable('ctags')
-  set complete+=t
+  setlocal complete+=t
   if !executable('rusty-tags') && executable('rustup')
     augroup Ctags
       autocmd!
@@ -10,7 +10,7 @@ if executable('ctags')
     augroup END
 
   endif
-  setlocal tags+=$RUST_SRC_PATH/rusty-tags.vi
+  setlocallocal tags+=$RUST_SRC_PATH/rusty-tags.vi
   augroup Rustytags
     autocmd!
     autocmd BufWritePost *.rs :silent! exec "!rusty-tags vi --quiet --start-dir" . expand('%:p:h') . "&" | redraw!
