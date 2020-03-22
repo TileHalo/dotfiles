@@ -1,6 +1,4 @@
-
 " VIMRC
-
 " MAINTAINER: Leo Lahti <leo.lahti1@gmail.com>
 " Basic config {{{
 set encoding=utf8
@@ -87,6 +85,7 @@ set showmatch
 set backspace=indent,eol,start
 set breakindent
 set browsedir=buffer
+set list
 
 " }}}
 " Indent options {{{
@@ -129,38 +128,48 @@ else
   call plug#begin("~/.local/share/nvim/plugged")
 endif
   Plug 'altercation/vim-colors-solarized'
+  Plug 'kana/vim-textobj-user'
+  Plug 'kana/vim-textobj-line'
+  Plug 'kana/vim-textobj-entire'
+  Plug 'kana/vim-textobj-indent'
+  Plug 'glts/vim-textobj-comment'
+  Plug 'kana/vim-textobj-function'
+  Plug 'rbonvall/vim-textobj-latex', {'for': ['tex', 'latex']}
+  Plug 'jasonlong/vim-textobj-css' , {'for': ['css', 'scss', 'sass']}
   Plug 'editorconfig/editorconfig-vim'
   Plug 'glts/vim-magnum'
   Plug 'glts/vim-radical'
-  Plug 'tikhomirov/vim-glsl'
-  Plug 'tpope/vim-commentary'
-  Plug 'tpope/vim-fugitive'
-  Plug 'tpope/vim-repeat'
-  Plug 'tpope/vim-surround'
-  Plug 'tpope/vim-unimpaired'
-  Plug 'tpope/vim-abolish'
-  Plug 'tpope/vim-markdown'
-  Plug 'tpope/vim-obsession'
-  Plug 'tpope/vim-rails'
-  Plug 'tpope/vim-eunuch'
-  Plug 'tpope/vim-sexp-mappings-for-regular-people'
-  Plug 'tpope/vim-dadbod'
-  Plug 'tpope/vim-fireplace', {'for': 'clojure'}
-  Plug 'tpope/vim-haml'
-  Plug 'tpope/vim-sleuth'
-  Plug 'tpope/vim-dotenv'
-  Plug 'tpope/vim-jdaddy'
-  Plug 'tpope/vim-apathy'
-  Plug 'tpope/vim-rhubarb'
-  Plug 'tpope/vim-speeddating'
-  Plug 'tpope/vim-tbone'
-  Plug 'tpope/vim-projectionist'
-  Plug 'michaeljsmith/vim-indent-object'
-  Plug 'junegunn/vim-peekaboo'
   Plug 'junegunn/goyo.vim'
   Plug 'junegunn/limelight.vim'
   Plug 'majutsushi/tagbar'
+  Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
+  Plug 'lervag/vimtex', {'for': 'tex'}
+  Plug 'michaeljsmith/vim-indent-object'
   Plug 'sheerun/vim-polyglot'
+  Plug 'tpope/vim-abolish'
+  Plug 'tpope/vim-apathy'
+  Plug 'tpope/vim-endwise'
+  Plug 'tpope/vim-commentary'
+  Plug 'tpope/vim-dadbod'
+  Plug 'tpope/vim-dispatch'
+  Plug 'tpope/vim-dotenv'
+  Plug 'tpope/vim-eunuch'
+  Plug 'tpope/vim-fireplace', {'for': ['clojure', 'scheme']}
+  Plug 'tpope/vim-fugitive'
+  Plug 'tpope/vim-haml'
+  Plug 'tpope/vim-jdaddy'
+  Plug 'tpope/vim-markdown'
+  Plug 'tpope/vim-obsession'
+  Plug 'tpope/vim-projectionist'
+  Plug 'tpope/vim-rails'
+  Plug 'tpope/vim-repeat'
+  Plug 'tpope/vim-rhubarb'
+  Plug 'tpope/vim-sexp-mappings-for-regular-people'
+  Plug 'tpope/vim-sleuth'
+  Plug 'tpope/vim-speeddating'
+  Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-tbone'
+  Plug 'tpope/vim-unimpaired'
 call plug#end()
 
 filetype plugin indent on
@@ -228,6 +237,9 @@ function! SetStatus()
 endfunction
 
 call SetStatus()
+" Listchar dimming
+hi SpecialKey ctermfg=10
+hi Whitespace ctermfg=10
 " }}}
 "  Grepping {{{
 command! -nargs=+ -complete=file_in_path -bar Grep  cgetexpr system(&grepprg . ' ' . shellescape(<q-args>))
@@ -243,7 +255,10 @@ augroup END
 set spelllang="en_gb"
 "  }}}
 " Helpers {{{
-
+augroup vimrc
+  autocmd!
+  autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+augroup end
 " }}}
 " NetRW {{{
 let g:netrw_banner=0        " disable banner

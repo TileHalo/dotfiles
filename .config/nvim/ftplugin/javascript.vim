@@ -6,5 +6,5 @@ setlocal shiftwidth=2
 setlocal tabstop=2
 
 setlocal path=.,front/src/js/,src/
-setlocallocal suffixesadd+=.js
-setlocallocal include=^\\s*[^\/]\\+\\(from\\\|require(['\"]\\)
+setlocal suffixesadd+=.js
+setlocal include=^\\s*[^\/]\\+\\(from\\\|require(['\"]\\)
