@@ -38,7 +38,7 @@ if has('cscope')
   cnoreabbrev csf cs find
   cnoreabbrev csk cs kill
   cnoreabbrev csr cs reset
-  cnoreabbrev css cs show
+  " cnoreabbrev css cs show
   cnoreabbrev csh cs help
 
   command! -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
@@ -48,6 +48,7 @@ if executable('ctags')
   set nocscopetag
 endif
 
+set diffopt+=algorithm:patience
 " Setting up ignores and path
 set path+=**
 set wildignore+=*/tmp/*,*.so,*.pyc,*.png,*.jpg,*.gif,*.jpeg,*.ico,*.pdf
@@ -62,8 +63,13 @@ set wildignore+=.cache,node_modules,package-lock.json,yarn.lock,dist,.git,Cargo.
 if executable('rg')
   set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
 endif
+
 if has("python3")
-  python3 import vim; from sys import version_info as v; vim.command('let python_version=%d' % (v[0] * 100 + v[1]))
+python3 << endpython
+import vim
+from sys import version_info as v
+vim.command('let python_version=%d' % (v[0] * 100 + v[1]))
+endpython
 else
   let python_version=0
 endif
@@ -74,7 +80,7 @@ else
   let g:python3_host_prog='python'
 endif
 " }}}
-" Basic UI {{{
+" Basic UI {{
 set number
 set relativenumber
 set showcmd
@@ -105,11 +111,12 @@ map <Down> :resize +1<cr>
 map <Up> :resize -1<cr>
 map <Right> :vertical resize +1<cr>
 
-vnoremap $( <esc>`>a)<esc>`<i(<esc>
-vnoremap $[ <esc>`>a]<esc>`<i[<esc>
-vnoremap ${ <esc>`>a}<esc>`<i{<esc>
-vnoremap $" <esc>`>a"<esc>`<i"<esc>
-vnoremap $' <esc>`>a'<esc>`<i'<esc>
+nnoremap <leader>cd :lcd %:h<CR>
+
+tnoremap <A-h> <C-\><C-N><C-w>h
+tnoremap <A-j> <C-\><C-N><C-w>j
+tnoremap <A-k> <C-\><C-N><C-w>k
+tnoremap <A-l> <C-\><C-N><C-w>l
 " }}}
 " Plugins {{{
 if empty(glob('~/.local/share/nvim/plugged')) && has('nvim')
@@ -127,38 +134,57 @@ if !has('nvim')
 else
   call plug#begin("~/.local/share/nvim/plugged")
 endif
+  Plug 'OmniSharp/omnisharp-vim', {'for': 'cs', 'do': ':OmniSharpInstall'}
   Plug 'altercation/vim-colors-solarized'
-  Plug 'kana/vim-textobj-user'
-  Plug 'kana/vim-textobj-line'
-  Plug 'kana/vim-textobj-entire'
-  Plug 'kana/vim-textobj-indent'
-  Plug 'glts/vim-textobj-comment'
-  Plug 'kana/vim-textobj-function'
-  Plug 'rbonvall/vim-textobj-latex', {'for': ['tex', 'latex']}
-  Plug 'jasonlong/vim-textobj-css' , {'for': ['css', 'scss', 'sass']}
+  Plug 'chrisdone/hindent', {'for': 'haskell', 'do': 'stack install hindent'}
+  Plug 'dhruvasagar/vim-table-mode'
+  Plug 'dkarter/bullets.vim'
   Plug 'editorconfig/editorconfig-vim'
   Plug 'glts/vim-magnum'
+  Plug 'coreysharris/Macaulay2.vim'
   Plug 'glts/vim-radical'
-  Plug 'junegunn/goyo.vim'
-  Plug 'junegunn/limelight.vim'
-  Plug 'majutsushi/tagbar'
+  Plug 'glts/vim-textobj-comment'
+  Plug 'godlygeek/tabular'
+  Plug 'honza/vim-snippets'
+  Plug 'yinflying/matlab.vim'
   Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
+  Plug 'jasonlong/vim-textobj-css' , {'for': ['css', 'scss', 'sass']}
+  Plug 'jmcomets/vim-pony', {'for': 'python'}
+  Plug 'junegunn/goyo.vim'
+  Plug 'ron-rs/ron.vim'
+  Plug 'junegunn/limelight.vim'
+  Plug 'racer-rust/vim-racer'
+  Plug 'kana/vim-textobj-entire'
+  Plug 'kana/vim-textobj-function'
+  Plug 'kana/vim-textobj-indent'
+  Plug 'kana/vim-textobj-line'
+  Plug 'kana/vim-textobj-user'
+  Plug 'lambdalisue/suda.vim'
   Plug 'lervag/vimtex', {'for': 'tex'}
+  Plug 'majutsushi/tagbar'
+  Plug 'matze/vim-tex-fold', {'for': 'tex'}
   Plug 'michaeljsmith/vim-indent-object'
+  Plug 'neovimhaskell/haskell-vim', {'for': 'haskell'}
+  Plug 'pechorin/any-jump.vim'
+  Plug 'rbonvall/vim-textobj-latex', {'for': ['tex', 'latex']}
   Plug 'sheerun/vim-polyglot'
+  Plug 'sirver/ultisnips'
+  Plug 'guns/vim-clojure-static', {'for': 'clojure'}
+  Plug 'guns/vim-clojure-highlight', {'for': 'clojure'}
+  Plug 'venantius/vim-cljfmt', {'for': 'clojure'}
   Plug 'tpope/vim-abolish'
   Plug 'tpope/vim-apathy'
-  Plug 'tpope/vim-endwise'
   Plug 'tpope/vim-commentary'
   Plug 'tpope/vim-dadbod'
   Plug 'tpope/vim-dispatch'
   Plug 'tpope/vim-dotenv'
+  Plug 'tpope/vim-endwise'
   Plug 'tpope/vim-eunuch'
   Plug 'tpope/vim-fireplace', {'for': ['clojure', 'scheme']}
+  Plug 'tpope/vim-salve', {'for': 'clojure'}
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-haml'
   Plug 'tpope/vim-jdaddy'
-  Plug 'tpope/vim-markdown'
   Plug 'tpope/vim-obsession'
   Plug 'tpope/vim-projectionist'
   Plug 'tpope/vim-rails'
@@ -170,14 +196,23 @@ endif
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-tbone'
   Plug 'tpope/vim-unimpaired'
+  Plug 'vim-pandoc/vim-pandoc-syntax'
 call plug#end()
 
 filetype plugin indent on
 syntax enable
 " }}}
-" Completion {{{
+" Completion and snippets {{{
 set cpt+=i,d
 set omnifunc=syntaxcomplete#Complete
+
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-j>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+" If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
+let g:racer_cmd = "$HOME/.cargo/bin/racer"
 " }}}
 " File browser {{{
 let g:netrw_banner = 0
@@ -194,7 +229,7 @@ nnoremap <leader>tk :Tagbar<cr>
 " Colourscheme
 set background=dark
 silent! colorscheme solarized
-" Statusline 
+" Statusline
 
 
 function! GitHead()
@@ -203,7 +238,7 @@ function! GitHead()
   endif
   let git = fugitive#head()
   if git != ''
-    return ' :: ' . git 
+    return ' :: ' . git
   else
     return ''
   endif
@@ -240,6 +275,7 @@ call SetStatus()
 " Listchar dimming
 hi SpecialKey ctermfg=10
 hi Whitespace ctermfg=10
+hi SignColumn ctermbg=8
 " }}}
 "  Grepping {{{
 command! -nargs=+ -complete=file_in_path -bar Grep  cgetexpr system(&grepprg . ' ' . shellescape(<q-args>))
@@ -258,7 +294,23 @@ set spelllang="en_gb"
 augroup vimrc
   autocmd!
   autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+  autocmd BufNewFile,BufFilePre,BufRead *.md set filetype=markdown.pandoc
 augroup end
+
+function! s:insert_gates()
+  let gatename = substitute(toupper(expand("%:t")), "\\.", "_", "g")
+  execute "normal! i#ifndef " . gatename
+  execute "normal! o#define " . gatename . " "
+  execute "normal! Go#endif /* " . gatename . " */"
+  normal! kk
+endfunction
+
+augroup ccpp
+  autocmd!
+  autocmd BufNewFile *.{h,hpp} call <SID>insert_gates()
+augroup END
+
+cabbrev sudo :w suda://%
 " }}}
 " NetRW {{{
 let g:netrw_banner=0        " disable banner
@@ -267,4 +319,32 @@ let g:netrw_altv=1          " open splits to the right
 let g:netrw_liststyle=3     " tree view
 let g:netrw_list_hide=netrw_gitignore#Hide()
 let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
+" }}}
+" Termdebug {{{
+hi debugPC term=reverse ctermbg=0
+hi debugBreakpoint ctermbg=8 ctermfg=1
+let g:termdebug_wide = 163
+" }}}
+" AnyJump {{{
+let g:any_jump_colors = {
+      \"plain_text":         "Comment",
+      \"preview":            "Comment",
+      \"preview_keyword":    "Operator",
+      \"heading_text":       "Function",
+      \"heading_keyword":    "Identifier",
+      \"group_text":         "Comment",
+      \"group_name":         "Function",
+      \"more_button":        "Operator",
+      \"more_explain":       "Comment",
+      \"result_line_number": "Comment",
+      \"result_text":        "Statement",
+      \"result_path":        "String",
+      \"help":               "Comment"
+      \}
+" }}}
+" My wiki shenanigans {{{
+nmap <leader>wd <Plug>(diary_open)
+nmap <leader>ww <Plug>(index_open)
+nmap <leader>wt <Plug>(todo_open)
+nmap <leader>wci <Plug>(create_index)
 " }}}
