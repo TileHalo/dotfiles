@@ -1,52 +1,32 @@
+-- Neovim config
+-- MAINTAINER: Leo Lahti <leo.lahti1@gmail.com>
+require('mapper')
+HOME = os.getenv("HOME")
+vim.opt.autowrite = true
+vim.g.mapleader = " "
+vim.g.maplocalleader = ","
+
+-- Persistent undo
+vim.opt.undofile = true
+vim.opt.undolevels = 500
+vim.opt.undoreload = 500
+vim.opt.undodir = HOME .. "/.vim/undo"
+
+-- Backup
+vim.opt.backupdir = HOME .. "/.vim/backup"
+
+-- Swap file
+vim.opt.directory = HOME .. "/.vim/swap"
+
+-- Line width helper
+vim.opt.cc = "80"
+
+if vim.fn.executable('rg') == 1 then
+  vim.opt.grepprg = 'rg --vimgrep --no-heading --smart-case'
+end
+
+-- Bunch of wildignore stuff, can't be bothered to port to Lua
 vim.cmd([[
-" Basic config {{{
-set encoding=utf8
-set autoread
-set autowrite
-set hidden
-set exrc
-runtime macros/matchit.vim
-
-let mapleader=" "
-let maplocalleader=","
-
-" Persistent undo
-set undofile
-set undodir=~/.vim/undodir
-set undolevels=500
-set undoreload=500
-
-" Backup
-set backupdir=~/.vim/tmp
-
-" Swap file
-set directory=~/.vim/swap/
-set cc=80
-
-
-" Ctags and Cscope
-if has('cscope')
-  set cscopeverbose
-  set cscopetag
-
-  if has('quickfix')
-    set cscopequickfix=s-,c-,d-,i-,t-,e-
-  endif
-
-  cnoreabbrev csa cs add
-  cnoreabbrev csf cs find
-  cnoreabbrev csk cs kill
-  cnoreabbrev csr cs reset
-  " cnoreabbrev css cs show
-  cnoreabbrev csh cs help
-
-  command! -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
-endif
-
-if executable('ctags')
-  set nocscopetag
-endif
-
 set diffopt+=algorithm:patience
 " Setting up ignores and path
 set path+=**
@@ -59,269 +39,337 @@ set wildignore+=*.swp,*~,._*
 set wildignore+=_pycache_,.DS_Store,.vscode,.localized
 set wildignore+=.cache,node_modules,package-lock.json,yarn.lock,dist,.git,Cargo.lock
 
-if executable('rg')
-  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
-endif
-
-if has("python3")
-python3 << endpython
-import vim
-from sys import version_info as v
-vim.command('let python_version=%d' % (v[0] * 100 + v[1]))
-endpython
-else
-  let python_version=0
-endif
-
-if python_version < 307
-  echo printf("Neovim won't work properly %d", python_version)
-else
-  let g:python3_host_prog='python'
-endif
-" }}}
-" Basic UI {{{
-set number
-set relativenumber
-set showcmd
-set lazyredraw
-set cursorline
-set wildmenu
-set showmatch
-set backspace=indent,eol,start
-set breakindent
-set browsedir=buffer
-set list
-" }}}
-" Indent options {{{
-set autoindent
-" }}}
-" Search options {{{
-set incsearch
-set hlsearch
-set smartcase
-" }}}
-" Basic keybindings {{{
-
-nnoremap <leader><leader> :nohlsearch<CR>
-
 map <Left> :vertical resize -1<cr>
 map <Down> :resize +1<cr>
 map <Up> :resize -1<cr>
 map <Right> :vertical resize +1<cr>
+  ]])
 
-nnoremap <leader>cd :lcd %:h<CR>
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.showcmd = true
+vim.opt.lazyredraw = true
+vim.opt.cursorline = true
+vim.opt.wildmenu = true
+vim.opt.showmatch = true
+vim.opt.breakindent = true
+vim.opt.list = true
+vim.opt.smartindent = true
+vim.opt.autoindent = true
+vim.opt.incsearch = true
+vim.opt.hlsearch = true
+vim.opt.smartcase = true
+vim.opt.browsedir = 'buffer'
 
-tnoremap <A-h> <C-\><C-N><C-w>h
-tnoremap <A-j> <C-\><C-N><C-w>j
-tnoremap <A-k> <C-\><C-N><C-w>k
-tnoremap <A-l> <C-\><C-N><C-w>l
-" }}}
-" Plugins {{{
-if empty(glob('~/.local/share/nvim/plugged')) && has('nvim')
-  silent !curl -fLo ~/.local/share/nvim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-elseif empty(glob('~/.vim/autoload/plug.vim')) && !has('nvim')
-  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-endif
+vim.opt.termguicolors = true
 
-if !has('nvim')
-  call plug#begin("~/.vim/plugged")
-else
-  call plug#begin("~/.local/share/nvim/plugged")
-endif
-  Plug 'altercation/vim-colors-solarized'
-  Plug 'dhruvasagar/vim-table-mode'
-  Plug 'dkarter/bullets.vim'
-  Plug 'editorconfig/editorconfig-vim'
-  Plug 'glts/vim-magnum'
-  Plug 'coreysharris/Macaulay2.vim'
-  Plug 'glts/vim-radical'
-  Plug 'glts/vim-textobj-comment'
-  Plug 'honza/vim-snippets'
-  Plug 'yinflying/matlab.vim'
-  Plug 'rust-lang/rust.vim'
-  Plug 'jasonlong/vim-textobj-css' , {'for': ['css', 'scss', 'sass']}
-  Plug 'jmcomets/vim-pony', {'for': 'python'}
-  Plug 'ron-rs/ron.vim'
-  Plug 'junegunn/limelight.vim'
-  Plug 'kana/vim-textobj-entire'
-  Plug 'kana/vim-textobj-function'
-  Plug 'kana/vim-textobj-indent'
-  Plug 'kana/vim-textobj-line'
-  Plug 'kana/vim-textobj-user'
-  Plug 'lambdalisue/suda.vim'
-  Plug 'lervag/vimtex', {'for': 'tex'}
-  Plug 'majutsushi/tagbar'
-  Plug 'matze/vim-tex-fold', {'for': 'tex'}
-  Plug 'michaeljsmith/vim-indent-object'
-  Plug 'rbonvall/vim-textobj-latex', {'for': ['tex', 'latex']}
-  Plug 'sheerun/vim-polyglot'
-  Plug 'sirver/ultisnips'
-  Plug 'guns/vim-clojure-static', {'for': 'clojure'}
-  Plug 'guns/vim-clojure-highlight', {'for': 'clojure'}
-  Plug 'venantius/vim-cljfmt', {'for': 'clojure'}
-  Plug 'tpope/vim-abolish'
-  Plug 'tpope/vim-apathy'
-  Plug 'tpope/vim-commentary'
-  Plug 'tpope/vim-dadbod'
-  Plug 'tpope/vim-dispatch'
-  Plug 'tpope/vim-dotenv'
-  Plug 'tpope/vim-endwise'
-  Plug 'tpope/vim-eunuch'
-  Plug 'tpope/vim-fireplace', {'for': ['clojure', 'scheme']}
-  Plug 'tpope/vim-salve', {'for': 'clojure'}
-  Plug 'tpope/vim-fugitive'
-  Plug 'tpope/vim-haml'
-  Plug 'tpope/vim-jdaddy'
-  Plug 'tpope/vim-obsession'
-  Plug 'tpope/vim-projectionist'
-  Plug 'tpope/vim-rails'
-  Plug 'tpope/vim-repeat'
-  Plug 'tpope/vim-rhubarb'
-  Plug 'tpope/vim-sexp-mappings-for-regular-people'
-  Plug 'tpope/vim-sleuth'
-  Plug 'tpope/vim-speeddating'
-  Plug 'tpope/vim-surround'
-  Plug 'tpope/vim-tbone'
-  Plug 'tpope/vim-unimpaired'
-  Plug 'vim-pandoc/vim-pandoc-syntax'
-call plug#end()
+-- Basic keybindings
+noremap("n", "<leader><leader>", ":nohlsearch<CR>")
+noremap("n", "<leader>cd", ":lcd %:h<CR>")
+snoremap('n', "bt", ":BufferNext<CR>")
+snoremap('n', "bT", ":BufferPrevious<CR>")
 
-filetype plugin indent on
-syntax enable
+-- File browser
+vim.g.netrw_banner = 0
+vim.g.netrw_liststyle = 3
+vim.g.netrw_browse_split = 4
+vim.g.netrw_altv = 1
+vim.g.netrw_winsize = 25
 
-let g:vimtex_view_method = 'zathura'
-" }}}
-" Completion and snippets {{{
-set cpt+=i,d
-set omnifunc=syntaxcomplete#Complete
+-- NetRW
+vim.g.netrw_banner = 0
+vim.g.netrw_browse_split = 4
+vim.g.netrw_altv = 1
+vim.g.netrw_liststyle = 3
+vim.g.netrw_list_hide = "netrw_gitignore#Hide()"
 
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<c-j>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+-- Plugins
+require('plugins')
 
-" If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
-" }}}
-" File browser {{{
-let g:netrw_banner = 0
-let g:netrw_liststyle = 3
-let g:netrw_browse_split = 4
-let g:netrw_altv = 1
-let g:netrw_winsize = 25
+-- Kommentary
+-- Make to be as tpope/commentary
+noremap("n", "gcc", "<Plug>kommentary_line_default")
+noremap("n", "gc", "<Plug>kommentary_motion_default")
+noremap("v", "gc", "<Plug>kommentary_visual_default<C-c>")
 
-nnoremap <leader>nk :Lexplore<cr>
-nnoremap <leader>tk :Tagbar<cr>
-" }}}
-" Colours {{{
+require 'nvim-treesitter.configs'.setup {
+  ensure_installed = { "c",
+    "lua",
+    "rust",
+    "bash",
+    "bibtex",
+    "make",
+    "go",
+    "latex",
+    "toml",
+    "verilog",
+    "yaml",
+    "vim"
+  },
+  highlight = {
+    enable = true
+  },
+  indent = {
+    enable = true
+  }
+}
+-- Automatically install LSP and other good stuff
+require 'mason'.setup {}
 
-" Colourscheme
-set background=dark
-silent! colorscheme solarized
-" Statusline
+require 'mason-lspconfig'.setup {
+  ensure_installed = { 'clangd',
+    'bashls',
+    'gopls',
+    'hls',
+    'texlab',
+    'sumneko_lua',
+    'rust_analyzer',
+    'verible',
+    'pylsp',
+    'arduino_language_server',
+    'asm_lsp',
+  },
+}
+local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+local cmp = require('cmp')
+
+cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+cmp.setup {
+  snippet = {
+    expand = function(args)
+      require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+    end,
+  },
+  window = {
+    -- completion = cmp.config.window.bordered(),
+    -- documentation = cmp.config.window.bordered(),
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.abort(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+  }),
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' }, -- For luasnip users.
+  }, {
+    { name = 'buffer' },
+  })
+}
+
+-- Set configuration for specific filetype.
+cmp.setup.filetype('gitcommit', {
+  sources = cmp.config.sources({
+    { name = 'cmp_git' },
+  }, {
+    { name = 'buffer' },
+  })
+})
+
+cmp.setup.cmdline({ '/', '?' }, {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = {
+    { name = 'buffer' }
+  }
+})
+
+cmp.setup.cmdline(':', {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources({
+    { name = 'path' }
+  }, {
+    { name = 'cmdline' }
+  })
+})
+vim.cmd([[
+  imap <silent><expr> <Tab> luasnip#expand_or_jumpable() ? '<Plug>luasnip-expand-or-jump' : '<Tab>'
+  " -1 for jumping backwards.
+  inoremap <silent> <S-Tab> <cmd>lua require'luasnip'.jump(-1)<Cr>
+
+  snoremap <silent> <Tab> <cmd>lua require('luasnip').jump(1)<Cr>
+  snoremap <silent> <S-Tab> <cmd>lua require('luasnip').jump(-1)<Cr>
+
+  " For changing choices in choiceNodes (not strictly necessary for a basic setup).
+  imap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'
+  smap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'
+]])
+
+-- Set up lspconfig.
+local capabilities = require('cmp_nvim_lsp')
+    .update_capabilities(vim.lsp.protocol.make_client_capabilities())
+
+-- Lsp configs
+local opts = { noremap = true, silent = true }
+vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
+
+-- Use an on_attach function to only map the following keys
+-- after the language server attaches to the current buffer
+local on_attach = function(client, bufnr)
+  -- Enable completion triggered by <c-x><c-o>
+  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+  -- Mappings.
+  -- See `:help vim.lsp.*` for documentation on any of the below functions
+  local bufopts = { noremap = true, silent = true, buffer = bufnr }
+  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+  vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
+  vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+  vim.keymap.set('n', '<leader>wl', function()
+    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+  end, bufopts)
+  vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, bufopts)
+  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
+  vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
+  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+  vim.keymap.set('n', '<leader>f', vim.lsp.buf.formatting, bufopts)
+end
+
+local lsp_flags = {
+  -- This is the default in Nvim 0.7+
+  debounce_text_changes = 150,
+}
+
+require 'lspconfig'.clangd.setup {
+  on_attach = on_attach,
+  flags = lsp_flags,
+  capabilities = capabilities,
+}
+require 'lspconfig'.bashls.setup {
+  on_attach = on_attach,
+  flags = lsp_flags,
+  capabilities = capabilities,
+}
+require 'lspconfig'.gopls.setup {
+  on_attach = on_attach,
+  flags = lsp_flags,
+  capabilities = capabilities,
+}
+require 'lspconfig'.hls.setup {
+  on_attach = on_attach,
+  flags = lsp_flags,
+  capabilities = capabilities,
+}
+require 'lspconfig'.texlab.setup {
+  on_attach = on_attach,
+  flags = lsp_flags,
+  capabilities = capabilities,
+  settings = {
+    chktex = {
+      onEdit = true,
+    }
+  },
+}
+require 'lspconfig'.sumneko_lua.setup {
+  on_attach = on_attach,
+  flags = lsp_flags,
+  capabilities = capabilities,
+  settings = {
+    Lua = {
+      diagnostics = {
+        globals = { 'vim' }
+      }
+    }
+  }
+}
+require 'lspconfig'.verible.setup {
+  on_attach = on_attach,
+  flags = lsp_flags,
+  capabilities = capabilities,
+}
+require 'lspconfig'.pylsp.setup {
+  on_attach = on_attach,
+  flags = lsp_flags,
+  capabilities = capabilities,
+}
+require 'lspconfig'.arduino_language_server.setup {
+  on_attach = on_attach,
+  flags = lsp_flags,
+  capabilities = capabilities,
+}
+require 'lspconfig'.asm_lsp.setup {
+  on_attach = on_attach,
+  flags = lsp_flags,
+  capabilities = capabilities,
+}
 
 
-function! GitHead()
-  if !(exists('fugitive#head'))
-    return ''
-  endif
-  let git = fugitive#head()
-  if git != ''
-    return ' :: ' . git
-  else
-    return ''
-  endif
-endfunction
+require 'lualine'.setup {
+  options = {
+    theme = 'solarized_dark'
+  }
+}
 
-function! Modified()
-  if &mod == 1
-    return ' :: [+] '
-  else
-    return ''
-  endif
-endfunction
+require 'mason-nvim-dap'.setup {
+  ensure_installed = { 'python', 'delve', 'cpptools' }
+}
 
-function! SetStatus()
-  set laststatus=2
-  set statusline=
-  set statusline+=\ \ <\ %f%{Modified()}%{GitHead()}\ ::\ %y>
-  " switching to right side
-  set statusline+=%=
-  set statusline+=<\ %n\ ::\ %l\ ::\ %L\ >
+-- LaTeX and KNAP
+local kmap = vim.keymap.set
 
-  hi! StatusLine ctermfg=0
-  hi! StatusLine ctermbg=1
+-- F5 processes the document once, and refreshes the view
+kmap('i', '<F5>', function() require("knap").process_once() end)
+kmap('v', '<F5>', function() require("knap").process_once() end)
+kmap('n', '<F5>', function() require("knap").process_once() end)
 
-  hi! StatusLineNC ctermfg=0
-  hi! StatusLineNC ctermbg=02
+-- F6 closes the viewer application, and allows settings to be reset
+kmap('i', '<F6>', function() require("knap").close_viewer() end)
+kmap('v', '<F6>', function() require("knap").close_viewer() end)
+kmap('n', '<F6>', function() require("knap").close_viewer() end)
 
-  " Separator
-  hi VertSplit ctermfg=1
-  hi VertSplit ctermbg=235
-endfunction
+-- F7 toggles the auto-processing on and off
+kmap('i', '<F7>', function() require("knap").toggle_autopreviewing() end)
+kmap('v', '<F7>', function() require("knap").toggle_autopreviewing() end)
+kmap('n', '<F7>', function() require("knap").toggle_autopreviewing() end)
 
-call SetStatus()
-" Listchar dimming
-hi SpecialKey ctermfg=10
-hi Whitespace ctermfg=10
-hi SignColumn ctermbg=8
-" }}}
-"  Grepping {{{
-command! -nargs=+ -complete=file_in_path -bar Grep  cgetexpr system(&grepprg . ' ' . shellescape(<q-args>))
-command! -nargs=+ -complete=file_in_path -bar LGrep lgetexpr system(&grepprg . ' ' . shellescape(<q-args>))
+-- F8 invokes a SyncTeX forward search, or similar, where appropriate
+kmap('i', '<F8>', function() require("knap").forward_jump() end)
+kmap('v', '<F8>', function() require("knap").forward_jump() end)
+kmap('n', '<F8>', function() require("knap").forward_jump() end)
+if vim.fn.executable('sioyek') then
+  vim.g.knap_settings = {
+    htmltohtml = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; sed 's/<\\/head>/<meta http-equiv=\"refresh\" content=\"1\" ><\\/head>/' \"$A\" > \"$B\"",
+    htmltohtmlviewerlaunch = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; firefox \"$B\"",
+    htmltohtmlviewerrefresh = "none",
+    mdtohtml = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; pandoc --standalone %docroot% -o \"$A\" && sed 's/<\\/head>/<meta http-equiv=\"refresh\" content=\"1\" ><\\/head>/' \"$A\" > \"$B\" ",
+    mdtohtmlviewerlaunch = "A=%outputfile% ; firefox \"${A%.html}-preview.html\"",
+    mdtohtmlviewerrefresh = "none",
+    mdtohtmlbufferasstdin = true,
+    textopdfviewerlaunch = "sioyek --inverse-search 'nvim --headless -es --cmd \"lua require('\"'\"'knaphelper'\"'\"').relayjump('\"'\"'%servername%'\"'\"','\"'\"'%1'\"'\"',%2,0)\"' --reuse-instance %outputfile%",
+    textopdfviewerrefresh = "none",
+    textopdfforwardjump = "sioyek --inverse-search 'nvim --headless -es --cmd \"lua require('\"'\"'knaphelper'\"'\"').relayjump('\"'\"'%servername%'\"'\"','\"'\"'%1'\"'\"',%2,0)\"' --reuse-instance --forward-search-file %srcfile% --forward-search-line %line% %outputfile%"
+  }
+elseif vim.fn.executable('zathura') then
+  vim.g.knap_settings = {
+    htmltohtml = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; sed 's/<\\/head>/<meta http-equiv=\"refresh\" content=\"1\" ><\\/head>/' \"$A\" > \"$B\"",
+    htmltohtmlviewerlaunch = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; firefox \"$B\"",
+    htmltohtmlviewerrefresh = "none",
+    mdtohtml = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; pandoc --standalone %docroot% -o \"$A\" && sed 's/<\\/head>/<meta http-equiv=\"refresh\" content=\"1\" ><\\/head>/' \"$A\" > \"$B\" ",
+    mdtohtmlviewerlaunch = "A=%outputfile% ; firefox \"${A%.html}-preview.html\"",
+    mdtohtmlviewerrefresh = "none",
+    mdtohtmlbufferasstdin = true,
+    textopdfviewerlaunch = "zathura --synctex-editor-command 'nvim --headless -es --cmd \"lua require('\"'\"'knaphelper'\"'\"').relayjump('\"'\"'%servername%'\"'\"','\"'\"'%{input}'\"'\"',%{line},0)\"' %outputfile%",
+    textopdfviewerrefresh = "none",
+    textopdfforwardjump = "zathura --synctex-forward=%line%:%column%:%srcfile% %outputfile%"
+  }
+end
 
-augroup Quickfix
-  autocmd!
-  autocmd QuickFixCmdPost cgetexpr cwindow
-  autocmd QuickFixCmdPost lgetexpr lwindow
-augroup END
-"  }}}
-"  Spelling {{{
-set spelllang="en_gb"
-"  }}}
-" Helpers {{{
-augroup vimrc
-  autocmd!
-  autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
-  autocmd BufNewFile,BufFilePre,BufRead *.md set filetype=markdown.pandoc
-augroup end
 
-function! s:insert_gates()
-  let gatename = substitute(toupper(expand("%:t")), "\\.", "_", "g")
-  execute "normal! i#ifndef " . gatename
-  execute "normal! o#define " . gatename . " "
-  execute "normal! Go#endif /* " . gatename . " */"
-  normal! kk
-endfunction
+-- Telescope
+local builtin = require('telescope.builtin')
+vim.keymap.set('n', 'ff', builtin.find_files, {})
+vim.keymap.set('n', 'fg', builtin.live_grep, {})
+vim.keymap.set('n', 'fb', builtin.buffers, {})
+vim.keymap.set('n', 'fh', builtin.help_tags, {})
 
-augroup ccpp
-  autocmd!
-  autocmd BufNewFile *.{h,hpp} call <SID>insert_gates()
-augroup END
 
-cabbrev sudo :w suda://%
-" }}}
-" NetRW {{{
-let g:netrw_banner=0        " disable banner
-let g:netrw_browse_split=4  " open in prior window
-let g:netrw_altv=1          " open splits to the right
-let g:netrw_liststyle=3     " tree view
-let g:netrw_list_hide=netrw_gitignore#Hide()
-let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
-" }}}
-" Termdebug {{{
-hi debugPC term=reverse ctermbg=0
-hi debugBreakpoint ctermbg=8 ctermfg=1
-let g:termdebug_wide = 163
-" }}}
-" My wiki shenanigans {{{
-nmap <leader>wd <Plug>(diary_open)
-nmap <leader>ww <Plug>(index_open)
-nmap <leader>wt <Plug>(todo_open)
-nmap <leader>wci <Plug>(create_index)
-" }}}
-
-	]])
+-- Which-key
+require 'which-key'.setup {}
