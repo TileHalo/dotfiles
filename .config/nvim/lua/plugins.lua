@@ -39,24 +39,30 @@ return require('packer').startup({function(use)
   use 'b3nj5m1n/kommentary'
   use 'jghauser/mkdir.nvim'
   use 'nvim-lualine/lualine.nvim'
+
+  -- Mason
   use 'williamboman/mason.nvim'
+  use 'jayp0521/mason-nvim-dap'
+  use 'williamboman/mason-lspconfig.nvim'
 
   -- Debugging
   use 'mfussenegger/nvim-dap'
   use 'rcarriga/nvim-dap-ui'
   use 'theHamsta/nvim-dap-virtual-text'
-  use 'jayp0521/mason-nvim-dap'
 
 
   -- Completion, snippets and LSP
   use 'neovim/nvim-lspconfig'
-  use 'williamboman/mason-lspconfig.nvim'
   use 'L3MON4D3/LuaSnip'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-buffer'
   use 'hrsh7th/cmp-path'
   use 'hrsh7th/cmp-cmdline'
   use 'hrsh7th/nvim-cmp'
+
+  -- Linting and formatting
+  use 'mfussenegger/nvim-lint'
+  use 'mhartington/formatter.nvim'
 
   -- Various utilities
   use 'gennaro-tedesco/nvim-peekup'

@@ -5,6 +5,8 @@ HOME = os.getenv("HOME")
 vim.opt.autowrite = true
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
+vim.opt.tabstop = 8
+vim.opt.shiftwidth = 8
 
 -- Persistent undo
 vim.opt.undofile = true
@@ -262,11 +264,6 @@ require 'lspconfig'.texlab.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
-  settings = {
-    chktex = {
-      onEdit = true,
-    }
-  },
 }
 require 'lspconfig'.sumneko_lua.setup {
   on_attach = on_attach,
@@ -294,6 +291,13 @@ require 'lspconfig'.arduino_language_server.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
+  cmd = {
+    "arduino-language-server",
+    "-cli-config", HOME .. "/arduino-cli.yaml",
+    "-fqbn", "arduino:avr:uno",
+    "-cli", "arduino-cli",
+    "-clangd", "clangd"
+  }
 }
 require 'lspconfig'.asm_lsp.setup {
   on_attach = on_attach,
@@ -351,8 +355,7 @@ elseif vim.fn.executable('zathura') then
   vim.g.knap_settings = {
     htmltohtml = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; sed 's/<\\/head>/<meta http-equiv=\"refresh\" content=\"1\" ><\\/head>/' \"$A\" > \"$B\"",
     htmltohtmlviewerlaunch = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; firefox \"$B\"",
-    htmltohtmlviewerrefresh = "none",
-    mdtohtml = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; pandoc --standalone %docroot% -o \"$A\" && sed 's/<\\/head>/<meta http-equiv=\"refresh\" content=\"1\" ><\\/head>/' \"$A\" > \"$B\" ",
+    htmltohtmlviewerrefresh = "none", mdtohtml = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; pandoc --standalone %docroot% -o \"$A\" && sed 's/<\\/head>/<meta http-equiv=\"refresh\" content=\"1\" ><\\/head>/' \"$A\" > \"$B\" ",
     mdtohtmlviewerlaunch = "A=%outputfile% ; firefox \"${A%.html}-preview.html\"",
     mdtohtmlviewerrefresh = "none",
     mdtohtmlbufferasstdin = true,
@@ -362,6 +365,7 @@ elseif vim.fn.executable('zathura') then
   }
 end
 
+-- Linters
 
 -- Telescope
 local builtin = require('telescope.builtin')
@@ -373,3 +377,5 @@ vim.keymap.set('n', 'fh', builtin.help_tags, {})
 
 -- Which-key
 require 'which-key'.setup {}
+
+require 'nvim-surround'.setup {}
