@@ -4,9 +4,15 @@ alias mlab='matlab -nosplash -nodesktop'
 GOPATH="$HOME/go"
 PATH="/usr/local/go/bin/:$HOME/.cargo/bin:$HOME/go/bin/:$PATH"
 PATH="$HOME/.local/bin/:$HOME/scripts:$PATH"
+PATH="$GHCUP_INSTALL_BASE_PREFIX/.ghcup/bin:$PATH"
+
 AURHOME="$HOME/AUR"
-QSYS_ROOTDIR="/home/leo/.cache/pacaur/quartus-free/pkg/quartus-free-quartus/opt/intelFPGA/20.1/quartus/sopc_builder/bin"
+
+if ! command -v nvimpager &> /dev/null; then
+	PAGER=nvimpager
+fi
+
 
 HOST=`hostname`
 PS1="[ ${HOST} :: ${USER} ] "
-export PS1 NVM_DIR GOPATH PATH AURHOME QSYS_ROOTDIR
+export PS1 NVM_DIR GOPATH PATH AURHOME PAGER

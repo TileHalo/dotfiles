@@ -39,54 +39,6 @@ map <S-Up> :resize -1<cr>
 map <S-Right> :vertical resize +1<cr>
   ]])
 
-local wildignore = {
-  "*/tmp/*",
-  "*.so",
-  "*.pyc",
-  "*.png",
-  "*.jpg",
-  "*.gif",
-  "*.jpeg",
-  "*.ico",
-  "*.pdf",
-  "*.wav",
-  "*.mp4",
-  "*.mp3",
-  "*.o",
-  "*.out",
-  "*.obj",
-  ".git",
-  "*.rbc",
-  "*.rbo",
-  "*.class",
-  ".svn",
-  "*.gem",
-  "*.zip",
-  "*.tar.gz",
-  "*.tar.bz2",
-  "*.rar",
-  "*.tar.xz",
-  "*/vendor/gems/*",
-  "*/vendor/cache/*",
-  "*/.bundle/*",
-  "*/.sass-cache/*",
-  "*.swp",
-  "*~",
-  "._*",
-  "_pycache_",
-  ".DS_Store",
-  ".vscode",
-  ".localized",
-  ".cache",
-  "node_modules",
-  "package-lock.json",
-  "yarn.lock",
-  "dist",
-  ".git",
-  "Cargo.lock",
-  }
-
-
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.showcmd = true
@@ -129,8 +81,12 @@ vim.g.netrw_list_hide = "netrw_gitignore#Hide()"
 require('plugins')
 
 -- Polyglot
-vim.g.polyglot_disabled = {"ftdetect"};
+vim.g.polyglot_disabled = { "ftdetect" };
 -- Kommentary
+require('kommentary.config').configure_language("default", {
+  prefer_single_line_comments = true,
+})
+
 -- Make to be as tpope/commentary
 noremap("n", "gcc", "<Plug>kommentary_line_default")
 noremap("n", "gc", "<Plug>kommentary_motion_default")
@@ -154,11 +110,16 @@ require 'nvim-treesitter.configs'.setup {
     enable = true
   },
   indent = {
-    enable = true
+    enable = true,
+    disable = { "c" }
   }
 }
 -- Automatically install LSP and other good stuff
-require 'mason'.setup {}
+require 'mason'.setup {
+  ui = {
+    border = "rounded"
+  }
+}
 
 require 'mason-lspconfig'.setup {
   ensure_installed = { 'clangd',
@@ -171,9 +132,27 @@ require 'mason-lspconfig'.setup {
     'verible',
     'pylsp',
     'arduino_language_server',
-    'asm_lsp',
   },
 }
+
+require 'mason-tool-installer'.setup {
+  ensure_installed = {
+    'cpptools',
+    'debugpy',
+    'bash-debug-adapter',
+    'luacheck',
+    'editorconfig-checker',
+    'flake8',
+    'black',
+    'goimports',
+    'fixjson',
+    'beautysh'
+  },
+  auto_update = false,
+  run_on_start = true
+}
+
+
 local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 local cmp = require('cmp')
 local lspkind = require('lspkind')
@@ -197,7 +176,7 @@ cmp.setup {
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-e>'] = cmp.mapping.abort(),
-    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    ['<CR>'] = cmp.mapping.confirm({ select = false }),
   }),
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },
@@ -223,7 +202,18 @@ cmp.setup.cmdline({ '/', '?' }, {
   }
 })
 
-require 'luasnip.loaders.from_snipmate'.lazy_load()
+cmp.setup.cmdline(':', {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources({
+    { name = 'path' }
+  }, {
+    { name = 'cmdline' }
+  })
+})
+local util = require 'packer.util'
+local snippath = util.join_paths(vim.fn.stdpath('data'), 'site', 'pack')
+snippath = util.join_paths(snippath, 'packer', 'start', 'vim-snippets')
+require 'luasnip.loaders.from_snipmate'.lazy_load({ path = snippath })
 
 vim.cmd([[
   imap <silent><expr> <Tab> luasnip#expand_or_jumpable() ? '<Plug>luasnip-expand-or-jump' : '<Tab>'
@@ -243,6 +233,7 @@ local capabilities = require('cmp_nvim_lsp')
     .default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 -- Lsp configs
+require 'neodev'.setup {}
 local opts = { noremap = true, silent = true }
 vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
@@ -272,7 +263,7 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
   vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<leader>f', vim.lsp.buf.formatting, bufopts)
+  vim.keymap.set('n', '<leader>f', vim.lsp.buf.format, bufopts)
 end
 
 local lsp_flags = {
@@ -370,7 +361,7 @@ vim.keymap.set('n', '<F5>', function() require('dap').step_over() end)
 vim.keymap.set('n', '<F6>', function() require('dap').step_into() end)
 vim.keymap.set('n', '<F7>', function() require('dap').step_out() end)
 
-vim.fn.sign_define('DapBreakpoint', {text='🛑', texthl='', linehl='', numhl=''})
+vim.fn.sign_define('DapBreakpoint', { text = '🛑', texthl = '', linehl = '', numhl = '' })
 
 dapui.setup {
   icons = { expanded = "▾", collapsed = "▸", current_frame = "▸" },
@@ -396,7 +387,7 @@ dapui.setup {
   layouts = {
     {
       elements = {
-      -- Elements can be strings or table with id and size keys.
+        -- Elements can be strings or table with id and size keys.
         { id = "scopes", size = 0.25 },
         "breakpoints",
         "stacks",
@@ -463,7 +454,7 @@ dap.configurations.c = {
     setupCommands = {
       {
         text = '-enable-pretty-printing',
-        description =  'enable pretty printing',
+        description = 'enable pretty printing',
         ignoreFailures = false
       },
     },
@@ -472,6 +463,7 @@ dap.configurations.c = {
 
 dap.configurations.cpp = dap.configurations.c
 dap.configurations.rust = dap.configurations.c
+require 'nvim-dap-virtual-text'.setup {}
 
 -- LaTeX and KNAP
 local kmap = vim.keymap.set
@@ -480,42 +472,56 @@ kmap('i', '<F8>', function() require("knap").toggle_autopreviewing() end)
 kmap('v', '<F8>', function() require("knap").toggle_autopreviewing() end)
 kmap('n', '<F8>', function() require("knap").toggle_autopreviewing() end)
 
-if vim.fn.executable('sioyek') then
-  vim.g.knap_settings = {
-    htmltohtml = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; sed 's/<\\/head>/<meta http-equiv=\"refresh\" content=\"1\" ><\\/head>/' \"$A\" > \"$B\"",
-    htmltohtmlviewerlaunch = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; firefox \"$B\"",
-    htmltohtmlviewerrefresh = "none",
-    mdtohtml = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; pandoc --standalone %docroot% -o \"$A\" && sed 's/<\\/head>/<meta http-equiv=\"refresh\" content=\"1\" ><\\/head>/' \"$A\" > \"$B\" ",
-    mdtohtmlviewerlaunch = "A=%outputfile% ; firefox \"${A%.html}-preview.html\"",
-    mdtohtmlviewerrefresh = "none",
-    mdtohtmlbufferasstdin = true,
-    textopdfviewerlaunch = "sioyek --inverse-search 'nvim --headless -es --cmd \"lua require('\"'\"'knaphelper'\"'\"').relayjump('\"'\"'%servername%'\"'\"','\"'\"'%1'\"'\"',%2,0)\"' --reuse-instance %outputfile%",
-    textopdfviewerrefresh = "none",
-    textopdfforwardjump = "sioyek --inverse-search 'nvim --headless -es --cmd \"lua require('\"'\"'knaphelper'\"'\"').relayjump('\"'\"'%servername%'\"'\"','\"'\"'%1'\"'\"',%2,0)\"' --reuse-instance --forward-search-file %srcfile% --forward-search-line %line% %outputfile%"
+require 'texview'.texview()
+
+-- Git signs
+require 'gitsigns'.setup()
+
+-- Formatting
+require 'tidy'.setup {
+  filetype_exclude = { 'markdown', 'diff' },
+}
+
+-- Testing
+require 'coverage'.setup {}
+require 'neotest'.setup {
+  adapters = {
+    require 'neotest-python',
+    require 'neotest-go',
+    require 'neotest-rust',
+    require 'neotest-haskell'
   }
-elseif vim.fn.executable('zathura') then
-  vim.g.knap_settings = {
-    htmltohtml = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; sed 's/<\\/head>/<meta http-equiv=\"refresh\" content=\"1\" ><\\/head>/' \"$A\" > \"$B\"",
-    htmltohtmlviewerlaunch = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; firefox \"$B\"",
-    htmltohtmlviewerrefresh = "none", mdtohtml = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; pandoc --standalone %docroot% -o \"$A\" && sed 's/<\\/head>/<meta http-equiv=\"refresh\" content=\"1\" ><\\/head>/' \"$A\" > \"$B\" ",
-    mdtohtmlviewerlaunch = "A=%outputfile% ; firefox \"${A%.html}-preview.html\"",
-    mdtohtmlviewerrefresh = "none",
-    mdtohtmlbufferasstdin = true,
-    textopdfviewerlaunch = "zathura --synctex-editor-command 'nvim --headless -es --cmd \"lua require('\"'\"'knaphelper'\"'\"').relayjump('\"'\"'%servername%'\"'\"','\"'\"'%{input}'\"'\"',%{line},0)\"' %outputfile%",
-    textopdfviewerrefresh = "none",
-    textopdfforwardjump = "zathura --synctex-forward=%line%:%column%:%srcfile% %outputfile%"
-  }
-end
+}
 
 -- Linters
+vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+  callback = function()
+    require('lint').try_lint()
+  end
+})
 
 -- Telescope
 local builtin = require('telescope.builtin')
+
 vim.keymap.set('n', 'ff', builtin.find_files, {})
 vim.keymap.set('n', 'fg', builtin.live_grep, {})
 vim.keymap.set('n', 'fb', builtin.buffers, {})
 vim.keymap.set('n', 'fh', builtin.help_tags, {})
 
+require 'telescope'.setup {
+  extensions = {
+    fzf = {
+      fuzzy = true,
+      override_generic_sorter = true,
+      override_file_sorter = true,
+      case_mode = "smart_case",
+    }
+  }
+}
+
+require 'telescope'.load_extension('fzf')
+
 
 require 'nvim-surround'.setup {}
 
+-- vi: ft=lua sw=2 ts=2 expandtab
