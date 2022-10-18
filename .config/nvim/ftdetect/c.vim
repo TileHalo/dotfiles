@@ -1,0 +1,1 @@
+/home/leo/.config/nvim/after/ftdetect/c.vim

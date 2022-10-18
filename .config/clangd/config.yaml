@@ -4,3 +4,7 @@ Index:
 CompileFlags:
   Add: [-std=gnu11, -Wall]
   Compiler: gcc
+
+Diagnostics:
+  ClangTidy:
+    Add: linuxkernel*

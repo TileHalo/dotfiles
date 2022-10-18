@@ -8,7 +8,6 @@ local ensure_packer = function()
   end
   return false
 end
-
 local packer_bootstrap = ensure_packer()
 
 vim.cmd([[
@@ -23,6 +22,7 @@ return require('packer').startup({function(use)
   use 'wbthomason/packer.nvim'
   use 'nvim-lua/plenary.nvim'
   use 'nathom/filetype.nvim'
+  use 'nvim-tree/nvim-web-devicons'
 
   use { 'nvim-telescope/telescope.nvim', tag = '0.1.0' }
 
@@ -30,7 +30,6 @@ return require('packer').startup({function(use)
   use { 'ishan9299/nvim-solarized-lua', config = function()
     vim.cmd('colorscheme solarized')
   end }
-  use 'kyazdani42/nvim-web-devicons'
   use {
     'nvim-treesitter/nvim-treesitter',
     run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
@@ -53,12 +52,16 @@ return require('packer').startup({function(use)
 
   -- Completion, snippets and LSP
   use 'neovim/nvim-lspconfig'
+  use 'onsails/lspkind.nvim'
   use 'L3MON4D3/LuaSnip'
+  use 'honza/vim-snippets'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-buffer'
   use 'hrsh7th/cmp-path'
   use 'hrsh7th/cmp-cmdline'
   use 'hrsh7th/nvim-cmp'
+
+  use {'simrat39/rust-tools.nvim', ft = 'rust'}
 
   -- Linting and formatting
   use 'mfussenegger/nvim-lint'
@@ -66,8 +69,7 @@ return require('packer').startup({function(use)
 
   -- Various utilities
   use 'gennaro-tedesco/nvim-peekup'
-  use {'kevinhwang91/nvim-bqf', ft = 'qf'}
-  use 'tpope/vim-repeat'
+  use 'tpope/vim-unimpaired'
   use 'kylechui/nvim-surround'
   use 'windwp/nvim-autopairs'
   use 'gpanders/editorconfig.nvim'
@@ -84,10 +86,8 @@ return require('packer').startup({function(use)
       {'nvim-lua/plenary.nvim'},
     }
   }
-  use "folke/which-key.nvim"
-
   -- LaTeX and like
-  use 'frabjous/knap'
+  use {'frabjous/knap', ft = 'tex'}
 
   -- git
   use { 'TimUntersberger/neogit', requires = 'nvim-lua/plenary.nvim' }

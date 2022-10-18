@@ -32,20 +32,60 @@ vim.cmd([[
 set diffopt+=algorithm:patience
 " Setting up ignores and path
 set path+=**
-set wildignore+=*/tmp/*,*.so,*.pyc,*.png,*.jpg,*.gif,*.jpeg,*.ico,*.pdf
-set wildignore+=*.wav,*.mp4,*.mp3
-set wildignore+=*.o,*.out,*.obj,.git,*.rbc,*.rbo,*.class,.svn,*.gem
-set wildignore+=*.zip,*.tar.gz,*.tar.bz2,*.rar,*.tar.xz
-set wildignore+=*/vendor/gems/*,*/vendor/cache/*,*/.bundle/*,*/.sass-cache/*
-set wildignore+=*.swp,*~,._*
-set wildignore+=_pycache_,.DS_Store,.vscode,.localized
-set wildignore+=.cache,node_modules,package-lock.json,yarn.lock,dist,.git,Cargo.lock
 
-map <Left> :vertical resize -1<cr>
-map <Down> :resize +1<cr>
-map <Up> :resize -1<cr>
-map <Right> :vertical resize +1<cr>
+map <S-Left> :vertical resize -1<cr>
+map <S-Down> :resize +1<cr>
+map <S-Up> :resize -1<cr>
+map <S-Right> :vertical resize +1<cr>
   ]])
+
+local wildignore = {
+  "*/tmp/*",
+  "*.so",
+  "*.pyc",
+  "*.png",
+  "*.jpg",
+  "*.gif",
+  "*.jpeg",
+  "*.ico",
+  "*.pdf",
+  "*.wav",
+  "*.mp4",
+  "*.mp3",
+  "*.o",
+  "*.out",
+  "*.obj",
+  ".git",
+  "*.rbc",
+  "*.rbo",
+  "*.class",
+  ".svn",
+  "*.gem",
+  "*.zip",
+  "*.tar.gz",
+  "*.tar.bz2",
+  "*.rar",
+  "*.tar.xz",
+  "*/vendor/gems/*",
+  "*/vendor/cache/*",
+  "*/.bundle/*",
+  "*/.sass-cache/*",
+  "*.swp",
+  "*~",
+  "._*",
+  "_pycache_",
+  ".DS_Store",
+  ".vscode",
+  ".localized",
+  ".cache",
+  "node_modules",
+  "package-lock.json",
+  "yarn.lock",
+  "dist",
+  ".git",
+  "Cargo.lock",
+  }
+
 
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -88,6 +128,8 @@ vim.g.netrw_list_hide = "netrw_gitignore#Hide()"
 -- Plugins
 require('plugins')
 
+-- Polyglot
+vim.g.polyglot_disabled = {"ftdetect"};
 -- Kommentary
 -- Make to be as tpope/commentary
 noremap("n", "gcc", "<Plug>kommentary_line_default")
@@ -134,6 +176,7 @@ require 'mason-lspconfig'.setup {
 }
 local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 local cmp = require('cmp')
+local lspkind = require('lspkind')
 
 cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
 cmp.setup {
@@ -143,8 +186,11 @@ cmp.setup {
     end,
   },
   window = {
-    -- completion = cmp.config.window.bordered(),
+    completion = cmp.config.window.bordered(),
     -- documentation = cmp.config.window.bordered(),
+  },
+  formatting = {
+    format = lspkind.cmp_format(),
   },
   mapping = cmp.mapping.preset.insert({
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -177,14 +223,8 @@ cmp.setup.cmdline({ '/', '?' }, {
   }
 })
 
-cmp.setup.cmdline(':', {
-  mapping = cmp.mapping.preset.cmdline(),
-  sources = cmp.config.sources({
-    { name = 'path' }
-  }, {
-    { name = 'cmdline' }
-  })
-})
+require 'luasnip.loaders.from_snipmate'.lazy_load()
+
 vim.cmd([[
   imap <silent><expr> <Tab> luasnip#expand_or_jumpable() ? '<Plug>luasnip-expand-or-jump' : '<Tab>'
   " -1 for jumping backwards.
@@ -200,7 +240,7 @@ vim.cmd([[
 
 -- Set up lspconfig.
 local capabilities = require('cmp_nvim_lsp')
-    .update_capabilities(vim.lsp.protocol.make_client_capabilities())
+    .default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 -- Lsp configs
 local opts = { noremap = true, silent = true }
@@ -293,7 +333,7 @@ require 'lspconfig'.arduino_language_server.setup {
   capabilities = capabilities,
   cmd = {
     "arduino-language-server",
-    "-cli-config", HOME .. "/arduino-cli.yaml",
+    "-cli-config", HOME .. "/.arduino15/arduino-cli.yaml",
     "-fqbn", "arduino:avr:uno",
     "-cli", "arduino-cli",
     "-clangd", "clangd"
@@ -312,32 +352,134 @@ require 'lualine'.setup {
   }
 }
 
+-- Debugging
+
 require 'mason-nvim-dap'.setup {
   ensure_installed = { 'python', 'delve', 'cpptools' }
 }
 
+local dap = require('dap')
+local dapui = require('dapui')
+local path = require "mason-core.path"
+
+vim.keymap.set('n', '<leader>dk', function() require('dap').continue() end)
+vim.keymap.set('n', '<leader>dl', function() require('dap').run_last() end)
+vim.keymap.set('n', '<leader>b', function() require('dap').toggle_breakpoint() end)
+vim.keymap.set('n', '<F2>', function() require('dapui').toggle() end)
+vim.keymap.set('n', '<F5>', function() require('dap').step_over() end)
+vim.keymap.set('n', '<F6>', function() require('dap').step_into() end)
+vim.keymap.set('n', '<F7>', function() require('dap').step_out() end)
+
+vim.fn.sign_define('DapBreakpoint', {text='🛑', texthl='', linehl='', numhl=''})
+
+dapui.setup {
+  icons = { expanded = "▾", collapsed = "▸", current_frame = "▸" },
+  mappings = {
+    -- Use a table to apply multiple mappings
+    expand = { "<CR>", "<2-LeftMouse>" },
+    open = "o",
+    remove = "d",
+    edit = "e",
+    repl = "r",
+    toggle = "t",
+  },
+  -- Expand lines larger than the window
+  -- Requires >= 0.7
+  expand_lines = vim.fn.has("nvim-0.7") == 1,
+  -- Layouts define sections of the screen to place windows.
+  -- The position can be "left", "right", "top" or "bottom".
+  -- The size specifies the height/width depending on position. It can be an Int
+  -- or a Float. Integer specifies height/width directly (i.e. 20 lines/columns) while
+  -- Float value specifies percentage (i.e. 0.3 - 30% of available lines/columns)
+  -- Elements are the elements shown in the layout (in order).
+  -- Layouts are opened in order so that earlier layouts take priority in window sizing.
+  layouts = {
+    {
+      elements = {
+      -- Elements can be strings or table with id and size keys.
+        { id = "scopes", size = 0.25 },
+        "breakpoints",
+        "stacks",
+        "watches",
+      },
+      size = 40, -- 40 columns
+      position = "left",
+    },
+    {
+      elements = {
+        "repl",
+        "console",
+      },
+      size = 0.25, -- 25% of total lines
+      position = "bottom",
+    },
+  },
+  controls = {
+    -- Requires Neovim nightly (or 0.8 when released)
+    enabled = false,
+  },
+  floating = {
+    max_height = nil, -- These can be integers or a float between 0 and 1.
+    max_width = nil, -- Floats will be treated as percentage of your screen.
+    border = "single", -- Border style. Can be "single", "double" or "rounded"
+    mappings = {
+      close = { "q", "<Esc>" },
+    },
+  },
+  windows = { indent = 1 },
+  render = {
+    max_type_length = nil, -- Can be integer or nil.
+    max_value_lines = 100, -- Can be integer or nil.
+  }
+}
+
+dap.listeners.after.event_initialized["dapui_config"] = function()
+  dapui.open()
+end
+--[[ dap.listeners.before.event_terminated["dapui_config"] = function()
+  dapui.close()
+en ]]
+dap.listeners.before.event_exited["dapui_config"] = function()
+  dapui.close()
+end
+
+
+dap.adapters.cppdbg = {
+  id = 'cppdbg',
+  type = 'executable',
+  command = path.concat { vim.fn.stdpath "data", "mason", "bin", "OpenDebugAD7" },
+}
+
+dap.configurations.c = {
+  {
+    name = "Launch file",
+    type = "cppdbg",
+    request = "launch",
+    program = function()
+      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+    end,
+    cwd = '${workspaceFolder}',
+    stopAtEntry = true,
+    setupCommands = {
+      {
+        text = '-enable-pretty-printing',
+        description =  'enable pretty printing',
+        ignoreFailures = false
+      },
+    },
+  },
+}
+
+dap.configurations.cpp = dap.configurations.c
+dap.configurations.rust = dap.configurations.c
+
 -- LaTeX and KNAP
 local kmap = vim.keymap.set
 
--- F5 processes the document once, and refreshes the view
-kmap('i', '<F5>', function() require("knap").process_once() end)
-kmap('v', '<F5>', function() require("knap").process_once() end)
-kmap('n', '<F5>', function() require("knap").process_once() end)
+kmap('i', '<F8>', function() require("knap").toggle_autopreviewing() end)
+kmap('v', '<F8>', function() require("knap").toggle_autopreviewing() end)
+kmap('n', '<F8>', function() require("knap").toggle_autopreviewing() end)
 
--- F6 closes the viewer application, and allows settings to be reset
-kmap('i', '<F6>', function() require("knap").close_viewer() end)
-kmap('v', '<F6>', function() require("knap").close_viewer() end)
-kmap('n', '<F6>', function() require("knap").close_viewer() end)
-
--- F7 toggles the auto-processing on and off
-kmap('i', '<F7>', function() require("knap").toggle_autopreviewing() end)
-kmap('v', '<F7>', function() require("knap").toggle_autopreviewing() end)
-kmap('n', '<F7>', function() require("knap").toggle_autopreviewing() end)
-
--- F8 invokes a SyncTeX forward search, or similar, where appropriate
-kmap('i', '<F8>', function() require("knap").forward_jump() end)
-kmap('v', '<F8>', function() require("knap").forward_jump() end)
-kmap('n', '<F8>', function() require("knap").forward_jump() end)
 if vim.fn.executable('sioyek') then
   vim.g.knap_settings = {
     htmltohtml = "A=%outputfile% ; B=\"${A%.html}-preview.html\" ; sed 's/<\\/head>/<meta http-equiv=\"refresh\" content=\"1\" ><\\/head>/' \"$A\" > \"$B\"",
@@ -375,7 +517,5 @@ vim.keymap.set('n', 'fb', builtin.buffers, {})
 vim.keymap.set('n', 'fh', builtin.help_tags, {})
 
 
--- Which-key
-require 'which-key'.setup {}
-
 require 'nvim-surround'.setup {}
+
