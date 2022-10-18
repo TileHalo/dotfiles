@@ -1,0 +1,6 @@
+Index:
+  Background: Build
+
+CompileFlags:
+  Add: [-std=gnu11, -Wall]
+  Compiler: gcc
