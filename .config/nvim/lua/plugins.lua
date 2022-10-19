@@ -25,8 +25,18 @@ return require('packer').startup({ function(use)
   use 'mcauley-penney/tidy.nvim'
   use 'nvim-tree/nvim-web-devicons'
 
+  -- Telescope
   use { 'nvim-telescope/telescope.nvim', tag = '0.1.0' }
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
+  use 'luc-tielen/telescope_hoogle'
+  use 'nvim-telescope/telescope-ui-select.nvim'
+  use { 'aloussase/scout', rtp = 'vim' }
+  use { "LinArcX/telescope-ports.nvim",
+    requires = {
+      { 'rcarriga/nvim-notify', branch = "master" }
+    }
+  }
+
 
   use 'sheerun/vim-polyglot'
   use { 'ishan9299/nvim-solarized-lua', config = function()
@@ -55,17 +65,21 @@ return require('packer').startup({ function(use)
 
 
   -- Completion, snippets and LSP
-  use 'neovim/nvim-lspconfig'
-  use 'onsails/lspkind.nvim'
   use 'L3MON4D3/LuaSnip'
   use 'honza/vim-snippets'
-  use 'hrsh7th/cmp-nvim-lsp'
-  use 'simrat39/symbols-outline.nvim'
   use 'hrsh7th/cmp-buffer'
-  use 'ray-x/lsp_signature.nvim'
-  use 'hrsh7th/cmp-path'
   use 'hrsh7th/cmp-cmdline'
+  use 'hrsh7th/cmp-nvim-lsp'
+  use 'hrsh7th/cmp-path'
   use 'hrsh7th/nvim-cmp'
+  use 'neovim/nvim-lspconfig'
+  use 'onsails/lspkind.nvim'
+  use 'ray-x/lsp_signature.nvim'
+  use 'simrat39/symbols-outline.nvim'
+  use {
+    'kosayoda/nvim-lightbulb',
+    requires = 'antoinemadec/FixCursorHold.nvim',
+}
 
   use { 'simrat39/rust-tools.nvim', ft = 'rust' }
   -- Git

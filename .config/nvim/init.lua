@@ -5,7 +5,7 @@ HOME = os.getenv("HOME")
 vim.opt.autowrite = true
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
-vim.opt.tabstop = 8
+
 vim.opt.shiftwidth = 8
 
 -- Persistent undo
@@ -79,6 +79,8 @@ vim.g.netrw_list_hide = "netrw_gitignore#Hide()"
 
 -- Plugins
 require('plugins')
+
+vim.notify = require 'notify'
 
 -- Polyglot
 vim.g.polyglot_disabled = { "ftdetect" };
@@ -174,7 +176,7 @@ cmp.setup {
   mapping = cmp.mapping.preset.insert({
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-Space>'] = cmp.mapping.complete({}),
     ['<C-e>'] = cmp.mapping.abort(),
     ['<CR>'] = cmp.mapping.confirm({ select = false }),
   }),
@@ -242,7 +244,7 @@ vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
-local on_attach = function(client, bufnr)
+local on_attach = function(_, bufnr)
   -- Enable completion triggered by <c-x><c-o>
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
@@ -336,6 +338,13 @@ require 'lspconfig'.asm_lsp.setup {
   capabilities = capabilities,
 }
 
+require 'lsp_signature'.setup {
+  bind = true,
+  handler_opts = {
+    border = "rounded"
+  }
+}
+
 
 require 'lualine'.setup {
   options = {
@@ -356,7 +365,7 @@ local path = require "mason-core.path"
 vim.keymap.set('n', '<leader>dk', function() require('dap').continue() end)
 vim.keymap.set('n', '<leader>dl', function() require('dap').run_last() end)
 vim.keymap.set('n', '<leader>b', function() require('dap').toggle_breakpoint() end)
-vim.keymap.set('n', '<F2>', function() require('dapui').toggle() end)
+vim.keymap.set('n', '<F2>', function() require('dapui').toggle({}) end)
 vim.keymap.set('n', '<F5>', function() require('dap').step_over() end)
 vim.keymap.set('n', '<F6>', function() require('dap').step_into() end)
 vim.keymap.set('n', '<F7>', function() require('dap').step_out() end)
@@ -425,13 +434,13 @@ dapui.setup {
 }
 
 dap.listeners.after.event_initialized["dapui_config"] = function()
-  dapui.open()
+  dapui.open({})
 end
 --[[ dap.listeners.before.event_terminated["dapui_config"] = function()
   dapui.close()
 en ]]
 dap.listeners.before.event_exited["dapui_config"] = function()
-  dapui.close()
+  dapui.close({})
 end
 
 
@@ -507,6 +516,9 @@ vim.keymap.set('n', 'ff', builtin.find_files, {})
 vim.keymap.set('n', 'fg', builtin.live_grep, {})
 vim.keymap.set('n', 'fb', builtin.buffers, {})
 vim.keymap.set('n', 'fh', builtin.help_tags, {})
+vim.keymap.set('n', 'fm', builtin.man_pages, {})
+vim.keymap.set('n', 'fbb', builtin.builtin, {})
+
 
 require 'telescope'.setup {
   extensions = {
@@ -515,13 +527,19 @@ require 'telescope'.setup {
       override_generic_sorter = true,
       override_file_sorter = true,
       case_mode = "smart_case",
-    }
+    },
   }
 }
 
 require 'telescope'.load_extension('fzf')
+require 'telescope'.load_extension('hoogle')
+require 'telescope'.load_extension('ui-select')
+-- require 'telescope'.load_extension('scout')
 
 
 require 'nvim-surround'.setup {}
+
+require 'symbols-outline'.setup {}
+require 'nvim-lightbulb'.setup { autocmd = { enabled = true } }
 
 -- vi: ft=lua sw=2 ts=2 expandtab
