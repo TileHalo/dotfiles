@@ -39,9 +39,8 @@ return require('packer').startup({ function(use)
 
 
   use 'sheerun/vim-polyglot'
-  use { 'ishan9299/nvim-solarized-lua', config = function()
-    vim.cmd('colorscheme solarized')
-  end }
+  use 'ishan9299/nvim-solarized-lua'
+  use 'RRethy/nvim-base16'
   use {
     'nvim-treesitter/nvim-treesitter',
     run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
@@ -79,7 +78,7 @@ return require('packer').startup({ function(use)
   use {
     'kosayoda/nvim-lightbulb',
     requires = 'antoinemadec/FixCursorHold.nvim',
-}
+  }
 
   use { 'simrat39/rust-tools.nvim', ft = 'rust' }
   -- Git
@@ -114,6 +113,19 @@ return require('packer').startup({ function(use)
       vim.keymap.set('n', '<leader>no', function() require('neotest').output.open() end, opts)
       vim.keymap.set('n', '<leader>ns', function() require('neotest').summary.toggle() end, opts)
     end
+  }
+
+  -- Making
+  use 'neomake/neomake'
+
+  -- Latex
+  use 'lervag/vimtex'
+
+  -- Haskell
+  use { 'MrcJkb/haskell-tools.nvim',
+    requires = {
+      'neovim/nvim-lspconfig'
+    }
   }
 
   -- Linting and formatting

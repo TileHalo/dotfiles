@@ -109,7 +109,8 @@ require 'nvim-treesitter.configs'.setup {
     "vim"
   },
   highlight = {
-    enable = true
+    enable = true,
+    disable = { "tex", "latex" },
   },
   indent = {
     enable = true,
@@ -288,11 +289,6 @@ require 'lspconfig'.gopls.setup {
   flags = lsp_flags,
   capabilities = capabilities,
 }
-require 'lspconfig'.hls.setup {
-  on_attach = on_attach,
-  flags = lsp_flags,
-  capabilities = capabilities,
-}
 require 'lspconfig'.texlab.setup {
   on_attach = on_attach,
   flags = lsp_flags,
@@ -336,6 +332,12 @@ require 'lspconfig'.asm_lsp.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
+}
+
+require 'haskell-tools'.setup {
+  hls = {
+    on_attach = on_attach,
+  },
 }
 
 require 'lsp_signature'.setup {
@@ -541,5 +543,7 @@ require 'nvim-surround'.setup {}
 
 require 'symbols-outline'.setup {}
 require 'nvim-lightbulb'.setup { autocmd = { enabled = true } }
+
+vim.cmd('colorscheme solarized')
 
 -- vi: ft=lua sw=2 ts=2 expandtab
