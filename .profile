@@ -12,10 +12,7 @@ PATH="$GHCUP_INSTALL_BASE_PREFIX/.ghcup/bin:$PATH"
 
 AURHOME="$HOME/AUR"
 
-if ! command -v nvimpager &> /dev/null; then
-	PAGER=nvimpager
-fi
-
+PAGER=nvimpager
 
 EDITOR=nvim
 

@@ -7,6 +7,7 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = ","
 
 vim.opt.shiftwidth = 8
+vim.opt.tabstop = 8
 
 -- Persistent undo
 vim.opt.undofile = true
@@ -79,6 +80,7 @@ vim.g.netrw_list_hide = "netrw_gitignore#Hide()"
 
 -- Plugins
 require('plugins')
+vim.cmd('colorscheme solarized')
 
 vim.notify = require 'notify'
 
@@ -505,7 +507,10 @@ require 'neotest'.setup {
 }
 
 -- Linters
+--
+vim.api.nvim_create_augroup("linter", {clear = true})
 vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+  group = "linter",
   callback = function()
     require('lint').try_lint()
   end
@@ -544,6 +549,5 @@ require 'nvim-surround'.setup {}
 require 'symbols-outline'.setup {}
 require 'nvim-lightbulb'.setup { autocmd = { enabled = true } }
 
-vim.cmd('colorscheme solarized')
 
 -- vi: ft=lua sw=2 ts=2 expandtab
