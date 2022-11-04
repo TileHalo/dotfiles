@@ -5,7 +5,6 @@ HOME = os.getenv("HOME")
 vim.opt.autowrite = true
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
-
 vim.opt.shiftwidth = 8
 vim.opt.tabstop = 8
 
@@ -33,6 +32,7 @@ vim.cmd([[
 set diffopt+=algorithm:patience
 " Setting up ignores and path
 set path+=**
+set shortmess+=A
 
 map <S-Left> :vertical resize -1<cr>
 map <S-Down> :resize +1<cr>
@@ -85,7 +85,7 @@ vim.cmd('colorscheme solarized')
 vim.notify = require 'notify'
 
 -- Polyglot
-vim.g.polyglot_disabled = { "ftdetect" };
+vim.g.polyglot_disabled = { "ftdetect", "sensible" };
 -- Kommentary
 require('kommentary.config').configure_language("default", {
   prefer_single_line_comments = true,
@@ -97,7 +97,8 @@ noremap("n", "gc", "<Plug>kommentary_motion_default")
 noremap("v", "gc", "<Plug>kommentary_visual_default<C-c>")
 
 require 'nvim-treesitter.configs'.setup {
-  ensure_installed = { "c",
+  ensure_installed = {
+    "c",
     "lua",
     "rust",
     "bash",
@@ -127,14 +128,15 @@ require 'mason'.setup {
 }
 
 require 'mason-lspconfig'.setup {
-  ensure_installed = { 'clangd',
+  ensure_installed = {
+    'clangd',
     'bashls',
     'gopls',
     'hls',
     'texlab',
     'sumneko_lua',
     'rust_analyzer',
-    'verible',
+    -- 'verible',
     'pylsp',
     'arduino_language_server',
   },
@@ -166,12 +168,11 @@ cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
 cmp.setup {
   snippet = {
     expand = function(args)
-      require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+      require('luasnip').lsp_expand(args.body)
     end,
   },
   window = {
     completion = cmp.config.window.bordered(),
-    -- documentation = cmp.config.window.bordered(),
   },
   formatting = {
     format = lspkind.cmp_format(),
@@ -185,6 +186,7 @@ cmp.setup {
   }),
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },
+    { name = 'tags' },
     { name = 'luasnip' }, -- For luasnip users.
   }, {
     { name = 'buffer' },
@@ -215,6 +217,14 @@ cmp.setup.cmdline(':', {
     { name = 'cmdline' }
   })
 })
+
+require "cmp".setup.filetype({ "tex", "plaintex" }, {
+  sources = {
+    { name = "lua-latex-symbols", option = { cache = true } }
+  }
+})
+
+
 local util = require 'packer.util'
 local snippath = util.join_paths(vim.fn.stdpath('data'), 'site', 'pack')
 snippath = util.join_paths(snippath, 'packer', 'start', 'vim-snippets')
@@ -268,7 +278,7 @@ local on_attach = function(_, bufnr)
   vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
   vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<leader>f', vim.lsp.buf.format, bufopts)
+  vim.keymap.set('n', '<leader>F', vim.lsp.buf.format, bufopts)
 end
 
 local lsp_flags = {
@@ -280,6 +290,7 @@ require 'lspconfig'.clangd.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
+  filetypes = {'cpp', 'objc', 'objcpp', 'cuda', 'proto' }
 }
 require 'lspconfig'.bashls.setup {
   on_attach = on_attach,
@@ -356,6 +367,8 @@ require 'lualine'.setup {
   }
 }
 
+require 'neogit'.setup {}
+
 -- Debugging
 
 require 'mason-nvim-dap'.setup {
@@ -370,8 +383,8 @@ vim.keymap.set('n', '<leader>dk', function() require('dap').continue() end)
 vim.keymap.set('n', '<leader>dl', function() require('dap').run_last() end)
 vim.keymap.set('n', '<leader>b', function() require('dap').toggle_breakpoint() end)
 vim.keymap.set('n', '<F2>', function() require('dapui').toggle({}) end)
-vim.keymap.set('n', '<F5>', function() require('dap').step_over() end)
-vim.keymap.set('n', '<F6>', function() require('dap').step_into() end)
+vim.keymap.set('n', '<leader>n', function() require('dap').step_over() end)
+vim.keymap.set('n', '<leader>s', function() require('dap').step_into() end)
 vim.keymap.set('n', '<F7>', function() require('dap').step_out() end)
 
 vim.fn.sign_define('DapBreakpoint', { text = '🛑', texthl = '', linehl = '', numhl = '' })
@@ -487,9 +500,6 @@ kmap('n', '<F8>', function() require("knap").toggle_autopreviewing() end)
 
 require 'texview'.texview()
 
--- Git signs
-require 'gitsigns'.setup()
-
 -- Formatting
 require 'tidy'.setup {
   filetype_exclude = { 'markdown', 'diff' },
@@ -506,6 +516,16 @@ require 'neotest'.setup {
   }
 }
 
+require 'neogen'.setup {
+  snippet_engine = "luasnip"
+}
+
+local opts = { noremap = true, silent = true }
+vim.api.nvim_set_keymap("n", "<Leader>cc", ":lua require('neogen').generate({ type = 'class' })<CR>", opts)
+vim.api.nvim_set_keymap("n", "<Leader>ct", ":lua require('neogen').generate({ type = 'type' })<CR>", opts)
+vim.api.nvim_set_keymap("n", "<Leader>cf", ":lua require('neogen').generate({ type = 'func' })<CR>", opts)
+vim.api.nvim_set_keymap("n", "<Leader>cF", ":lua require('neogen').generate({ type = 'file' })<CR>", opts)
+
 -- Linters
 --
 vim.api.nvim_create_augroup("linter", {clear = true})
@@ -519,12 +539,12 @@ vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
 -- Telescope
 local builtin = require('telescope.builtin')
 
-vim.keymap.set('n', 'ff', builtin.find_files, {})
-vim.keymap.set('n', 'fg', builtin.live_grep, {})
-vim.keymap.set('n', 'fb', builtin.buffers, {})
-vim.keymap.set('n', 'fh', builtin.help_tags, {})
-vim.keymap.set('n', 'fm', builtin.man_pages, {})
-vim.keymap.set('n', 'fbb', builtin.builtin, {})
+vim.keymap.set('n', '<leader>f', builtin.find_files, {})
+vim.keymap.set('n', '<leader>g', builtin.live_grep, {})
+vim.keymap.set('n', '<leader>;', builtin.buffers, {})
+vim.keymap.set('n', '<leader>h', builtin.help_tags, {})
+vim.keymap.set('n', '<leader>m', builtin.man_pages, {})
+vim.keymap.set('n', '<leader>bb', builtin.builtin, {})
 
 
 require 'telescope'.setup {
@@ -541,6 +561,7 @@ require 'telescope'.setup {
 require 'telescope'.load_extension('fzf')
 require 'telescope'.load_extension('hoogle')
 require 'telescope'.load_extension('ui-select')
+require 'telescope'.load_extension('notify')
 -- require 'telescope'.load_extension('scout')
 
 

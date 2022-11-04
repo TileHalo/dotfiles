@@ -1,0 +1,6 @@
+
+set editor="nvim -c 'setlocal nospell'
+set from = "leo.lahti1@gmail.com"
+set realname = "Leo Lahti"
+
+# vi: ft=muttrc

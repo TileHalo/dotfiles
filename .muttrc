@@ -1,0 +1,50 @@
+set my_name = "Leo Lahti"
+
+# Configure usage of notmuch
+set folder = "~/Mail"
+set virtual_spoolfile=yes
+virtual-mailboxes "Gmail" "notmuch://?query=tag:inbox and tag:gmail"
+virtual-mailboxes "NiiNu" "notmuch://?query=tag:inbox and tag:niinu"
+virtual-mailboxes "Partio" "notmuch://?query=tag:inbox and tag:partio"
+virtual-mailboxes "lahti.pw" "notmuch://?query=tag:inbox and tag:pw"
+virtual-mailboxes "suckless" "notmuch://?query=tag:inbox and tag:suckless"
+virtual-mailboxes "suckless-hackers" "notmuch://?query=tag:inbox and tag:suckless-hackers"
+virtual-mailboxes "linux-btrfs" "notmuch://?query=tag:inbox and tag:linux-btrfs"
+virtual-mailboxes "linux-can" "notmuch://?query=tag:inbox and tag:linux-can"
+virtual-mailboxes "linux-c" "notmuch://?query=tag:inbox and tag:linux-c"
+virtual-mailboxes "archive" "notmuch://?query=tag:archive"
+virtual-mailboxes "sent" "notmuch://?query=tag:sent"
+virtual-mailboxes "trash" "notmuch://?query=tag:trash"
+set nm_record=yes
+
+set header_cache=~/.cache/mutt
+
+set sidebar_visible
+set sidebar_format = "%D%?F? [%F]?%* %?N?%N/?%S"
+set mail_check_stats
+set sidebar_short_path
+set sidebar_delim_chars = '/.'
+set sidebar_folder_indent = yes
+set sidebar_indent_string = '  '
+set sidebar_divider_char = '|'
+set sidebar_sort_method = 'unsorted'
+bind index,pager \CP sidebar-prev
+bind index,pager \CN sidebar-next
+bind index,pager \CO sidebar-open
+
+
+source "~/.mutt/colors/solarized_dark"
+
+set mailcap_path = ~/.mutt/mailcap
+auto_view text/html
+
+set edit_headers=yes
+set send_charset="utf-8"
+set use_from=yes
+set envelope_from=yes
+
+
+# Hooks to switch account
+source "~/.mutt/pw"
+folder-hook pw 'source ~/.mutt/pw'
+folder-hook gmail 'source ~/.mutt/gmail'

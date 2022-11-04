@@ -25,6 +25,12 @@ return require('packer').startup({ function(use)
   use 'mcauley-penney/tidy.nvim'
   use 'nvim-tree/nvim-web-devicons'
 
+  use {
+    'Fymyte/mbsync.vim',
+    ft = 'mbsync',
+  }
+
+
   -- Telescope
   use { 'nvim-telescope/telescope.nvim', tag = '0.1.0' }
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
@@ -46,6 +52,7 @@ return require('packer').startup({ function(use)
     run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
   }
   use 'nvim-treesitter/nvim-treesitter-context'
+  use 'm-demare/hlargs.nvim'
 
   use 'b3nj5m1n/kommentary'
   use 'jghauser/mkdir.nvim'
@@ -66,10 +73,15 @@ return require('packer').startup({ function(use)
   -- Completion, snippets and LSP
   use 'L3MON4D3/LuaSnip'
   use 'honza/vim-snippets'
+  use "amarakon/nvim-cmp-lua-latex-symbols"
   use 'hrsh7th/cmp-buffer'
   use 'hrsh7th/cmp-cmdline'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-path'
+  use { 'quangnguyen30192/cmp-nvim-tags',
+    ft = { 'c' }
+  }
+  use 'saadparwaiz1/cmp_luasnip'
   use 'hrsh7th/nvim-cmp'
   use 'neovim/nvim-lspconfig'
   use 'onsails/lspkind.nvim'
@@ -81,8 +93,9 @@ return require('packer').startup({ function(use)
   }
 
   use { 'simrat39/rust-tools.nvim', ft = 'rust' }
-  -- Git
-  use 'lewis6991/gitsigns.nvim'
+
+  -- Comment generation
+  use { 'danymat/neogen', requires = 'nvim-treesitter/nvim-treesitter' }
 
   -- Testing
   use 'andythigpen/nvim-coverage'

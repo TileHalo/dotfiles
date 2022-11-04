@@ -1,0 +1,27 @@
+#!/bin/bash
+PIDFILE=.git/cscope.pid
+
+log() {
+    : # echo "[$$]" $(date +'%F %T'): "$@" >>.git/cscope.log
+}
+
+if [ -e $PIDFILE ]; then
+    PID=$(cat $PIDFILE)
+    PGRP=$(ps x -o  "%p %r" | grep $PID | awk '{print $2}')
+    log "Killing process group $PGRP"
+    kill -TERM -$PGRP
+fi
+
+echo $$ >.git/cscope.pid
+
+log "Finding files"
+find . | grep -E '.*\.(c(pp)?|h(pp)?)$' > .git/cscope.files
+
+log "Running cscope"
+case $PWD/ in
+    $HOME/code/linux/*) cscope -i .git/cscope.files -bkq ;;
+    *) cscope -i .git/cscope.files -bq ;;
+esac
+
+log "Clean up"
+rm $PIDFILE

@@ -1,0 +1,72 @@
+Create Both
+Expunge Both
+SyncState *
+
+IMAPAccount gmail
+Host imap.gmail.com
+User leo.lahti1@gmail.com
+PassCmd "pass gmail/leo | awk '/^imap:/ { print $2; }'"
+SSLType IMAPS
+AuthMechs LOGIN
+
+IMAPStore gmail-remote
+Account gmail
+
+MaildirStore gmail-local
+Path ~/Mail/gmail/
+Inbox ~/Mail/gmail/inbox
+
+Channel gmail-inbox
+Far :gmail-remote:
+Near :gmail-local:
+Patterns "INBOX"
+
+Channel gmail-sent
+Far :gmail-remote:"[Gmail]/Sent Mail"
+Near :gmail-local:sent
+
+Channel gmail-trash
+Far :gmail-remote:"[Gmail]/Trash"
+Near :gmail-local:trash
+
+Group gmail
+Channel gmail-inbox
+Channel gmail-sent
+Channel gmail-trash
+
+IMAPAccount pw
+Host lahti.pw
+User leo@lahti.pw
+PassCmd "pass show lahti.pw/mail/leo"
+SSLType IMAPS
+AuthMechs LOGIN
+
+IMAPStore pw-remote
+Account pw
+
+MaildirStore pw-local
+Path ~/Mail/pw/
+Inbox ~/Mail/pw/inbox
+
+Channel pw-default
+Far :pw-remote:
+Near :pw-local:Inbox
+#Patterns INBOX
+
+Channel pw-sent
+Far :pw-remote:"Sent"
+Near  :pw-local:Sent
+
+Channel pw-trash
+Far :pw-remote:"Trash"
+Near  :pw-local:Trash
+
+Channel pw-junk
+Far :pw-remote:"Junk"
+Near  :pw-local:Junk
+
+Group pw
+Channel pw-default
+Channel pw-trash
+Channel pw-sent
+Channel pw-junk

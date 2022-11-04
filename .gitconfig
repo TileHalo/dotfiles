@@ -1,0 +1,13 @@
+[user]
+	name = Lahti Leo
+	email = leo.m.lahti@aalto.fi
+[init]
+	defaultBranch = main
+	templatedir = ~/.git_template
+[core]
+	editor = nvim
+[merge]
+	tool = nvimdiff
+[alias]
+	ctags = !.git/hooks/ctags
+	cscope = !.git/hooks/cscope

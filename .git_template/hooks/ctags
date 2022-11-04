@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+trap 'rm -rf "$$.tags"' EXIT
+git ls-files | \
+  ctags --tag-relative -L - -f"$$.tags" --languages=C,c
+mv "$$.tags" "tags"
+
+# vim: set ft=sh

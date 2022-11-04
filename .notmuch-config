@@ -1,0 +1,19 @@
+[database]
+path=/home/leo/Mail
+
+
+[user]
+name=Leo Lahti
+primary_email=leo@lahti.pw
+
+other_email=leo.lahti1@gmail.com
+
+[new]
+tags=unread;inbox
+ignore=.mbsyncstate;.uidvalidity;.notmuch
+
+
+[search]
+
+
+[maildir]

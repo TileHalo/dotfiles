@@ -1,0 +1,5 @@
+
+set editor="nvim -c 'setlocal spelllang=en'
+set from = "leo@lahti.pw"
+set realname = "Leo Lahti"
+# vi: ft=muttrc
