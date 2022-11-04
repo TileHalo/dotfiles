@@ -1,6 +1,7 @@
 [user]
-	name = Lahti Leo
-	email = leo.m.lahti@aalto.fi
+	name = Leo Lahti
+	email = leo@lahti.pw
+
 [init]
 	defaultBranch = main
 	templatedir = ~/.git_template
@@ -13,3 +14,5 @@
 	cscope = !.git/hooks/cscope
 [pull]
 	rebase = true
+[commit]
+	gpgsign = true
