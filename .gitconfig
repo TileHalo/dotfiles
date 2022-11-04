@@ -11,3 +11,5 @@
 [alias]
 	ctags = !.git/hooks/ctags
 	cscope = !.git/hooks/cscope
+[pull]
+	rebase = true
