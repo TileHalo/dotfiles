@@ -46,7 +46,6 @@ return require('packer').startup({ function(use)
 
   use 'sheerun/vim-polyglot'
   use 'ishan9299/nvim-solarized-lua'
-  use 'RRethy/nvim-base16'
   use {
     'nvim-treesitter/nvim-treesitter',
     run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
@@ -54,7 +53,7 @@ return require('packer').startup({ function(use)
   use 'nvim-treesitter/nvim-treesitter-context'
   use 'm-demare/hlargs.nvim'
 
-  use 'b3nj5m1n/kommentary'
+  use 'numToStr/Comment.nvim'
   use 'jghauser/mkdir.nvim'
   use 'nvim-lualine/lualine.nvim'
 
@@ -75,12 +74,10 @@ return require('packer').startup({ function(use)
   use 'honza/vim-snippets'
   use "amarakon/nvim-cmp-lua-latex-symbols"
   use 'hrsh7th/cmp-buffer'
+  use 'hrsh7th/cmp-omni'
   use 'hrsh7th/cmp-cmdline'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-path'
-  use { 'quangnguyen30192/cmp-nvim-tags',
-    ft = { 'c' }
-  }
   use 'saadparwaiz1/cmp_luasnip'
   use 'hrsh7th/nvim-cmp'
   use 'neovim/nvim-lspconfig'

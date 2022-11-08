@@ -38,6 +38,10 @@ map <S-Left> :vertical resize -1<cr>
 map <S-Down> :resize +1<cr>
 map <S-Up> :resize -1<cr>
 map <S-Right> :vertical resize +1<cr>
+
+augroup ftdetect
+  autocmd BufRead,BufNewFile *.h,*.c set filetype=c
+augroup END
   ]])
 
 vim.opt.number = true
@@ -86,15 +90,7 @@ vim.notify = require 'notify'
 
 -- Polyglot
 vim.g.polyglot_disabled = { "ftdetect", "sensible" };
--- Kommentary
-require('kommentary.config').configure_language("default", {
-  prefer_single_line_comments = true,
-})
-
--- Make to be as tpope/commentary
-noremap("n", "gcc", "<Plug>kommentary_line_default")
-noremap("n", "gc", "<Plug>kommentary_motion_default")
-noremap("v", "gc", "<Plug>kommentary_visual_default<C-c>")
+require 'Comment'.setup{}
 
 require 'nvim-treesitter.configs'.setup {
   ensure_installed = {
@@ -136,7 +132,7 @@ require 'mason-lspconfig'.setup {
     'texlab',
     'sumneko_lua',
     'rust_analyzer',
-    -- 'verible',
+    'svls',
     'pylsp',
     'arduino_language_server',
   },
@@ -186,7 +182,6 @@ cmp.setup {
   }),
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },
-    { name = 'tags' },
     { name = 'luasnip' }, -- For luasnip users.
   }, {
     { name = 'buffer' },
@@ -207,6 +202,17 @@ cmp.setup.cmdline({ '/', '?' }, {
   sources = {
     { name = 'buffer' }
   }
+})
+
+cmp.setup.filetype('c', {
+  sources = cmp.config.sources({
+    { name = 'luasnip' },
+    { name = 'omni' },
+  }, {
+    { name = 'buffer' }
+  })
+
+
 })
 
 cmp.setup.cmdline(':', {
@@ -319,7 +325,7 @@ require 'lspconfig'.sumneko_lua.setup {
     }
   }
 }
-require 'lspconfig'.verible.setup {
+require 'lspconfig'.svls.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
@@ -368,6 +374,8 @@ require 'lualine'.setup {
 }
 
 require 'neogit'.setup {}
+
+require 'hlargs'.setup {}
 
 -- Debugging
 
