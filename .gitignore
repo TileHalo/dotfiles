@@ -1,2 +1,5 @@
 .cfg
 $HOME/.config/nvim/plugin/packer_compiled.lua
+.gitsecret/keys/random_seed
+!*.secret
+Mail/.notmuch/hooks/post-new
