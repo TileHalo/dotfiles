@@ -1,6 +1,5 @@
 -- Neovim config
 -- MAINTAINER: Leo Lahti <leo.lahti1@gmail.com>
-require('mapper')
 HOME = os.getenv("HOME")
 vim.opt.autowrite = true
 vim.g.mapleader = " "
@@ -29,20 +28,14 @@ end
 
 -- Bunch of wildignore stuff, can't be bothered to port to Lua
 vim.cmd([[
-set diffopt+=algorithm:patience
-" Setting up ignores and path
-set path+=**
-set shortmess+=A
-
-map <S-Left> :vertical resize -1<cr>
-map <S-Down> :resize +1<cr>
-map <S-Up> :resize -1<cr>
-map <S-Right> :vertical resize +1<cr>
-
 augroup ftdetect
   autocmd BufRead,BufNewFile *.h,*.c set filetype=c
 augroup END
   ]])
+
+vim.opt.diffopt  = vim.opt.diffopt + "algorithm:patience"
+vim.opt.path = vim.opt.path + "**"
+vim.opt.shortmess = vim.opt.shortmess + "A"
 
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -62,11 +55,6 @@ vim.opt.browsedir = 'buffer'
 
 vim.opt.termguicolors = true
 
--- Basic keybindings
-noremap("n", "<leader><leader>", ":nohlsearch<CR>")
-noremap("n", "<leader>cd", ":lcd %:h<CR>")
-snoremap('n', "bt", ":BufferNext<CR>")
-snoremap('n', "bT", ":BufferPrevious<CR>")
 
 -- File browser
 vim.g.netrw_banner = 0
@@ -87,6 +75,26 @@ require('plugins')
 vim.cmd('colorscheme solarized')
 
 vim.notify = require 'notify'
+local map = require 'cartographer'
+local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+local cmp = require('cmp')
+local lspkind = require('lspkind')
+local util = require 'packer.util'
+local snippath = util.join_paths(vim.fn.stdpath('data'), 'site', 'pack')
+local dap = require('dap')
+local dapui = require('dapui')
+local rt = require('rust-tools')
+local path = require "mason-core.path"
+
+-- Basic keybindings
+map.n.nore.silent['<leader><leader>'] = ':nohlsearch<CR>'
+map.n.nore.silent['<leader>cd'] = ':lcd %:h<CR>'
+map.n.nore.silent['bt'] = ':BufferNext<CR>'
+map.n.nore.silent['bT'] = ':BufferPrevious<CR>'
+map['<S-Left>'] =  ':vertical resize -1<cr>'
+map['<S-Down>'] = ':resize +1<cr>'
+map['<S-Up>'] = ':resize -1<cr>'
+map['<S-Right>'] = ':vertical resize +1<cr>'
 
 -- Polyglot
 vim.g.polyglot_disabled = { "ftdetect", "sensible" };
@@ -156,9 +164,6 @@ require 'mason-tool-installer'.setup {
 }
 
 
-local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-local cmp = require('cmp')
-local lspkind = require('lspkind')
 
 cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
 cmp.setup {
@@ -231,23 +236,15 @@ require "cmp".setup.filetype({ "tex", "plaintex" }, {
 })
 
 
-local util = require 'packer.util'
-local snippath = util.join_paths(vim.fn.stdpath('data'), 'site', 'pack')
 snippath = util.join_paths(snippath, 'packer', 'start', 'vim-snippets')
 require 'luasnip.loaders.from_snipmate'.lazy_load({ path = snippath })
 
-vim.cmd([[
-  imap <silent><expr> <Tab> luasnip#expand_or_jumpable() ? '<Plug>luasnip-expand-or-jump' : '<Tab>'
-  " -1 for jumping backwards.
-  inoremap <silent> <S-Tab> <cmd>lua require'luasnip'.jump(-1)<Cr>
-
-  snoremap <silent> <Tab> <cmd>lua require('luasnip').jump(1)<Cr>
-  snoremap <silent> <S-Tab> <cmd>lua require('luasnip').jump(-1)<Cr>
-
-  " For changing choices in choiceNodes (not strictly necessary for a basic setup).
-  imap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'
-  smap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'
-]])
+map.i.silent.expr['<Tab'] = 'luasnip#expand_or_jumpable() ?' ..
+                            '"<Plug>luasnip-expand-or-jump" : "<Tab>"'
+map.i.s.nore.silent['<S-Tab>'] = '<cmd>lua require("luasnip").jump(-1)<Cr>'
+map.s.nore.silent['<Tab>'] = '<cmd>lua require("luasnip").jump(1)<Cr>'
+map.i.s.expr.silent['<C-E>'] = 'luasnip#choice_active() ?' ..
+                               '"<Plug>luasnip-next-choice" : "<C-E>"'
 
 -- Set up lspconfig.
 local capabilities = require('cmp_nvim_lsp')
@@ -255,11 +252,10 @@ local capabilities = require('cmp_nvim_lsp')
 
 -- Lsp configs
 require 'neodev'.setup {}
-local opts = { noremap = true, silent = true }
-vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
-vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
+map.n.nore.silent['<leader>e'] = '<Cmd>lua vim.diagnostic.open_float()<CR>'
+map.n.nore.silent['[d'] = '<Cmd>lua vim.diagnostic.goto_prev()<CR>'
+map.n.nore.silent[']d'] = '<Cmd>lua vim.diagnostic.goto_next()<CR>'
+map.n.nore.silent['<leader>q'] = '<Cmd>lua vim.diagnostic.setloclist()<CR>'
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
@@ -269,22 +265,21 @@ local on_attach = function(_, bufnr)
 
   -- Mappings.
   -- See `:help vim.lsp.*` for documentation on any of the below functions
-  local bufopts = { noremap = true, silent = true, buffer = bufnr }
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-  vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-  vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-  vim.keymap.set('n', '<leader>wl', function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, bufopts)
-  vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, bufopts)
-  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
-  vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<leader>F', vim.lsp.buf.format, bufopts)
+  local mml = map.nore.silent['buffer'..bufnr]
+  mml['gD'] = '<Cmd>lua vim.lsp.buf.declaration()<CR>'
+  mml['gd'] = '<Cmd>lua vim.lsp.buf.definition()<CR>'
+  mml['K'] = '<Cmd>lua vim.lsp.buf.hover()<CR>'
+  mml['gi'] = '<Cmd>lua vim.lsp.buf.implementation()<CR>'
+  mml['<C-k>'] = '<Cmd>lua vim.lsp.buf.signature_help()<CR>'
+  mml['<leader>wa'] = '<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>'
+  mml['<leader>wr'] = '<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>'
+  mml['<leader>wl'] = '<Cmd>lua print(vim.inspect(vim.lsp.buf' ..
+                      '.list_workspace_folders()))<CR>'
+  mml['<leader>D'] = '<Cmd>lua vim.lsp.buf.type_definition()<CR>'
+  mml['<leader>rn'] = '<Cmd>lua vim.lsp.buf.rename()<CR>'
+  mml['<leader>ca'] = '<Cmd>lua vim.lsp.buf.code_action()<CR>'
+  mml['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+  mml['<leader>F'] = '<Cmd>lua vim.lsp.buf.format()<CR>'
 end
 
 local lsp_flags = {
@@ -359,6 +354,18 @@ require 'haskell-tools'.setup {
   },
 }
 
+
+rt.setup {
+  server = {
+    on_attach = function(_, bufnr)
+      on_attach(_, bufnr)
+      local mml = map.nore.silent['buffer'..bufnr]
+      mml['K'] = '<Cmd>RustHoverActions<CR>'
+
+    end,
+  }
+}
+
 require 'lsp_signature'.setup {
   bind = true,
   handler_opts = {
@@ -375,32 +382,26 @@ require 'lualine'.setup {
 
 require 'neogit'.setup {}
 
-require 'hlargs'.setup {}
-
 -- Debugging
 
 require 'mason-nvim-dap'.setup {
   ensure_installed = { 'python', 'delve', 'cpptools' }
 }
 
-local dap = require('dap')
-local dapui = require('dapui')
-local path = require "mason-core.path"
 
-vim.keymap.set('n', '<leader>dk', function() require('dap').continue() end)
-vim.keymap.set('n', '<leader>dl', function() require('dap').run_last() end)
-vim.keymap.set('n', '<leader>b', function() require('dap').toggle_breakpoint() end)
-vim.keymap.set('n', '<F2>', function() require('dapui').toggle({}) end)
-vim.keymap.set('n', '<leader>n', function() require('dap').step_over() end)
-vim.keymap.set('n', '<leader>s', function() require('dap').step_into() end)
-vim.keymap.set('n', '<F7>', function() require('dap').step_out() end)
+map.n['<leader>dk'] = '<Cmd>lua require("dap").continue()<CR>'
+map.n['<leader>dl'] = '<Cmd>lua require("dap").run_last()<CR>'
+map.n['<leader>b'] = '<Cmd>lua require("dap").toggle_breakpoint()<CR>'
+map.n['<F2'] = '<Cmd>lua require("dapui").toggle({})<CR>'
+map.n['<leader>n'] = '<Cmd>lua require("dap").step_over()<CR>'
+map.n['<leader>s'] = '<Cmd>lua require("dap").step_into()<CR>'
+map.n['<F7'] = '<Cmd>lua require("dap").step_out()<CR>'
 
 vim.fn.sign_define('DapBreakpoint', { text = '🛑', texthl = '', linehl = '', numhl = '' })
 
 dapui.setup {
   icons = { expanded = "▾", collapsed = "▸", current_frame = "▸" },
   mappings = {
-    -- Use a table to apply multiple mappings
     expand = { "<CR>", "<2-LeftMouse>" },
     open = "o",
     remove = "d",
@@ -408,16 +409,7 @@ dapui.setup {
     repl = "r",
     toggle = "t",
   },
-  -- Expand lines larger than the window
-  -- Requires >= 0.7
   expand_lines = vim.fn.has("nvim-0.7") == 1,
-  -- Layouts define sections of the screen to place windows.
-  -- The position can be "left", "right", "top" or "bottom".
-  -- The size specifies the height/width depending on position. It can be an Int
-  -- or a Float. Integer specifies height/width directly (i.e. 20 lines/columns) while
-  -- Float value specifies percentage (i.e. 0.3 - 30% of available lines/columns)
-  -- Elements are the elements shown in the layout (in order).
-  -- Layouts are opened in order so that earlier layouts take priority in window sizing.
   layouts = {
     {
       elements = {
@@ -499,13 +491,6 @@ dap.configurations.cpp = dap.configurations.c
 dap.configurations.rust = dap.configurations.c
 require 'nvim-dap-virtual-text'.setup {}
 
--- LaTeX and KNAP
-local kmap = vim.keymap.set
-
-kmap('i', '<F8>', function() require("knap").toggle_autopreviewing() end)
-kmap('v', '<F8>', function() require("knap").toggle_autopreviewing() end)
-kmap('n', '<F8>', function() require("knap").toggle_autopreviewing() end)
-
 require 'texview'.texview()
 
 -- Formatting
@@ -514,6 +499,20 @@ require 'tidy'.setup {
 }
 
 -- Testing
+local neotest_ns = vim.api.nvim_create_namespace("neotest")
+vim.diagnostic.config({
+  virtual_text = {
+    format = function(diagnostic)
+      local message =
+      diagnostic.message:gsub("\n", " "):gsub("\t", " "):gsub("%s+", " "):gsub("^%s+", "")
+      return message
+    end,
+  },
+}, neotest_ns)
+map.n.nore['<leader>nr'] = 'require("neotest").run.run()'
+map.n.nore['<leader>no'] = 'require("neotest").output.open()'
+map.n.nore['<leader>ns'] = 'require("neotest").summary.toggle()'
+
 require 'coverage'.setup {}
 require 'neotest'.setup {
   adapters = {
@@ -528,11 +527,11 @@ require 'neogen'.setup {
   snippet_engine = "luasnip"
 }
 
-local opts = { noremap = true, silent = true }
-vim.api.nvim_set_keymap("n", "<Leader>cc", ":lua require('neogen').generate({ type = 'class' })<CR>", opts)
-vim.api.nvim_set_keymap("n", "<Leader>ct", ":lua require('neogen').generate({ type = 'type' })<CR>", opts)
-vim.api.nvim_set_keymap("n", "<Leader>cf", ":lua require('neogen').generate({ type = 'func' })<CR>", opts)
-vim.api.nvim_set_keymap("n", "<Leader>cF", ":lua require('neogen').generate({ type = 'file' })<CR>", opts)
+local neogencmd = "<Cmd>lua require('neogen').generate({ type = '%s' })<CR>"
+map.n.nore.silent['<Leader>cc'] = string.format(neogencmd, 'class')
+map.n.nore.silent['<Leader>ct'] = string.format(neogencmd, 'type')
+map.n.nore.silent['<Leader>cf'] = string.format(neogencmd, 'func')
+map.n.nore.silent['<Leader>cF'] = string.format(neogencmd, 'file')
 
 -- Linters
 --
@@ -545,14 +544,12 @@ vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
 })
 
 -- Telescope
-local builtin = require('telescope.builtin')
-
-vim.keymap.set('n', '<leader>f', builtin.find_files, {})
-vim.keymap.set('n', '<leader>g', builtin.live_grep, {})
-vim.keymap.set('n', '<leader>;', builtin.buffers, {})
-vim.keymap.set('n', '<leader>h', builtin.help_tags, {})
-vim.keymap.set('n', '<leader>m', builtin.man_pages, {})
-vim.keymap.set('n', '<leader>bb', builtin.builtin, {})
+map.n['<leader>f'] = '<Cmd>lua require("telescope.builtin").find_files()<CR>'
+map.n['<leader>g'] = '<Cmd>lua require("telescope.builtin").live_grep()<CR>'
+map.n['<leader'] = '<Cmd>lua require("telescope.builtin").buffers()<CR>'
+map.n['<leader>h'] = '<Cmd>lua require("telescope.builtin").help_tags()<CR>'
+map.n['<leader>m'] = '<Cmd>lua require("telescope.builtin").man_pages()<CR>'
+map.n['<leader>bb'] = '<Cmd>lua require("telescope.builtin").builtin()<CR>'
 
 
 require 'telescope'.setup {
@@ -577,6 +574,8 @@ require 'nvim-surround'.setup {}
 
 require 'symbols-outline'.setup {}
 require 'nvim-lightbulb'.setup { autocmd = { enabled = true } }
+
+map.x.n['ga'] = '<Plug>(EasyAlign)'
 
 
 -- vi: ft=lua sw=2 ts=2 expandtab

@@ -20,6 +20,7 @@ set nm_record=yes
 set header_cache=~/.cache/mutt
 
 set sidebar_visible
+set abort_unmodified=no
 set sidebar_format = "%D%?F? [%F]?%* %?N?%N/?%S"
 set mail_check_stats
 set sidebar_short_path

@@ -24,6 +24,7 @@ return require('packer').startup({ function(use)
   use 'nathom/filetype.nvim'
   use 'mcauley-penney/tidy.nvim'
   use 'nvim-tree/nvim-web-devicons'
+  use 'Iron-E/nvim-cartographer'
 
   use {
     'Fymyte/mbsync.vim',
@@ -48,7 +49,9 @@ return require('packer').startup({ function(use)
   use 'ishan9299/nvim-solarized-lua'
   use {
     'nvim-treesitter/nvim-treesitter',
-    run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
+    run = function()
+      require('nvim-treesitter.install').update({ with_sync = true })
+    end,
   }
   use 'nvim-treesitter/nvim-treesitter-context'
   use 'm-demare/hlargs.nvim'
@@ -83,13 +86,14 @@ return require('packer').startup({ function(use)
   use 'neovim/nvim-lspconfig'
   use 'onsails/lspkind.nvim'
   use 'ray-x/lsp_signature.nvim'
+  use 'junegunn/vim-easy-align'
   use 'simrat39/symbols-outline.nvim'
   use {
     'kosayoda/nvim-lightbulb',
     requires = 'antoinemadec/FixCursorHold.nvim',
   }
 
-  use { 'simrat39/rust-tools.nvim', ft = 'rust' }
+  use { 'simrat39/rust-tools.nvim'}
 
   -- Comment generation
   use { 'danymat/neogen', requires = 'nvim-treesitter/nvim-treesitter' }
@@ -107,22 +111,6 @@ return require('packer').startup({ function(use)
       "rouge8/neotest-rust",
       "MrcJkb/neotest-haskell",
     },
-    config = function()
-      local neotest_ns = vim.api.nvim_create_namespace("neotest")
-      vim.diagnostic.config({
-        virtual_text = {
-          format = function(diagnostic)
-            local message =
-            diagnostic.message:gsub("\n", " "):gsub("\t", " "):gsub("%s+", " "):gsub("^%s+", "")
-            return message
-          end,
-        },
-      }, neotest_ns)
-      local opts = { noremap = true, }
-      vim.keymap.set('n', '<leader>nr', function() require('neotest').run.run() end, opts)
-      vim.keymap.set('n', '<leader>no', function() require('neotest').output.open() end, opts)
-      vim.keymap.set('n', '<leader>ns', function() require('neotest').summary.toggle() end, opts)
-    end
   }
 
   -- Making
@@ -132,7 +120,9 @@ return require('packer').startup({ function(use)
   use 'lervag/vimtex'
 
   -- Haskell
-  use { 'MrcJkb/haskell-tools.nvim',
+  use {
+    'MrcJkb/haskell-tools.nvim',
+
     requires = {
       'neovim/nvim-lspconfig'
     }
@@ -151,6 +141,7 @@ return require('packer').startup({ function(use)
   use 'gpanders/editorconfig.nvim'
   use {
     'romgrk/barbar.nvim',
+
     requires = { 'kyazdani42/nvim-web-devicons' }
   }
   use {
@@ -162,15 +153,14 @@ return require('packer').startup({ function(use)
       { 'nvim-lua/plenary.nvim' },
     }
   }
-  -- LaTeX and like
-  use { 'frabjous/knap', ft = 'tex' }
 
   -- git
   use { 'TimUntersberger/neogit', requires = 'nvim-lua/plenary.nvim' }
 
-  use { 'junegunn/fzf', run = function()
-    vim.fn['fzf#install']()
-  end
+  use { 'junegunn/fzf',
+    run = function()
+      vim.fn['fzf#install']()
+    end
   }
   if packer_bootstrap then
     require('packer').sync()
