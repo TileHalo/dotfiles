@@ -4,7 +4,7 @@
 
 [init]
 	defaultBranch = main
-	templatedir = ~/.git_template
+	; templatedir = ~/.git_template
 [core]
 	editor = nvim
 [merge]
@@ -16,3 +16,10 @@
 	rebase = true
 [commit]
 	gpgsign = true
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+[gpg]
+	program = /home/leo/.local/bin/gpggit

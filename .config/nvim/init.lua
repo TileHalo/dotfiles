@@ -85,6 +85,8 @@ local dap = require('dap')
 local dapui = require('dapui')
 local rt = require('rust-tools')
 local path = require "mason-core.path"
+local lspconfig = require 'lspconfig'
+local configs = require 'lspconfig.configs'
 
 -- Basic keybindings
 map.n.nore.silent['<leader><leader>'] = ':nohlsearch<CR>'
@@ -238,8 +240,7 @@ require "cmp".setup.filetype({ "tex", "plaintex" }, {
 
 snippath = util.join_paths(snippath, 'packer', 'start', 'vim-snippets')
 require 'luasnip.loaders.from_snipmate'.lazy_load({ path = snippath })
-
-map.i.silent.expr['<Tab'] = 'luasnip#expand_or_jumpable() ?' ..
+map.i.expr.silent['<Tab>'] = 'luasnip#expand_or_jumpable() ?' ..
                             '"<Plug>luasnip-expand-or-jump" : "<Tab>"'
 map.i.s.nore.silent['<S-Tab>'] = '<cmd>lua require("luasnip").jump(-1)<Cr>'
 map.s.nore.silent['<Tab>'] = '<cmd>lua require("luasnip").jump(1)<Cr>'
@@ -287,28 +288,28 @@ local lsp_flags = {
   debounce_text_changes = 150,
 }
 
-require 'lspconfig'.clangd.setup {
+lspconfig.clangd.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
   filetypes = {'cpp', 'objc', 'objcpp', 'cuda', 'proto' }
 }
-require 'lspconfig'.bashls.setup {
+lspconfig.bashls.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
 }
-require 'lspconfig'.gopls.setup {
+lspconfig.gopls.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
 }
-require 'lspconfig'.texlab.setup {
+lspconfig.texlab.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
 }
-require 'lspconfig'.sumneko_lua.setup {
+lspconfig.sumneko_lua.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
@@ -320,17 +321,17 @@ require 'lspconfig'.sumneko_lua.setup {
     }
   }
 }
-require 'lspconfig'.svls.setup {
+lspconfig.svls.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
 }
-require 'lspconfig'.pylsp.setup {
+lspconfig.pylsp.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
 }
-require 'lspconfig'.arduino_language_server.setup {
+lspconfig.arduino_language_server.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
@@ -342,7 +343,7 @@ require 'lspconfig'.arduino_language_server.setup {
     "-clangd", "clangd"
   }
 }
-require 'lspconfig'.asm_lsp.setup {
+lspconfig.asm_lsp.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
@@ -353,6 +354,24 @@ require 'haskell-tools'.setup {
     on_attach = on_attach,
   },
 }
+
+-- Manual lsp for vhdl_ls
+if not configs.rust_hdl then
+  configs.rust_hdl = {
+    default_config = {
+      cmd = {'vhdl_ls'};
+      filetypes = { "vhdl" };
+      root_dir = require 'lspconfig.util'.find_git_ancestor,
+      settings = {};
+    };
+  }
+end
+
+-- lspconfig.rust_hdl.setup {
+--   on_attach = on_attach,
+--   flags = lsp_flags,
+--   capabilities = capabilities,
+-- }
 
 
 rt.setup {
@@ -387,7 +406,6 @@ require 'neogit'.setup {}
 require 'mason-nvim-dap'.setup {
   ensure_installed = { 'python', 'delve', 'cpptools' }
 }
-
 
 map.n['<leader>dk'] = '<Cmd>lua require("dap").continue()<CR>'
 map.n['<leader>dl'] = '<Cmd>lua require("dap").run_last()<CR>'
@@ -535,6 +553,9 @@ map.n.nore.silent['<Leader>cF'] = string.format(neogencmd, 'file')
 
 -- Linters
 --
+require 'lint'.linters_by_ft = {
+  markdown = {},
+}
 vim.api.nvim_create_augroup("linter", {clear = true})
 vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
   group = "linter",
