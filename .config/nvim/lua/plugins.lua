@@ -21,7 +21,6 @@ vim.cmd([[
 return require('packer').startup({ function(use)
   use 'wbthomason/packer.nvim'
   use 'nvim-lua/plenary.nvim'
-  use 'nathom/filetype.nvim'
   use 'mcauley-penney/tidy.nvim'
   use 'nvim-tree/nvim-web-devicons'
   use 'Iron-E/nvim-cartographer'
@@ -37,7 +36,6 @@ return require('packer').startup({ function(use)
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
   use 'luc-tielen/telescope_hoogle'
   use 'nvim-telescope/telescope-ui-select.nvim'
-  use { 'aloussase/scout', rtp = 'vim' }
   use { "LinArcX/telescope-ports.nvim",
     requires = {
       { 'rcarriga/nvim-notify', branch = "master" }

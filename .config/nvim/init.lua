@@ -138,11 +138,9 @@ require 'mason-lspconfig'.setup {
     'clangd',
     'bashls',
     'gopls',
-    'hls',
     'texlab',
-    'sumneko_lua',
+    'lua_ls',
     'rust_analyzer',
-    'svls',
     'pylsp',
     'arduino_language_server',
   },
@@ -309,7 +307,7 @@ lspconfig.texlab.setup {
   flags = lsp_flags,
   capabilities = capabilities,
 }
-lspconfig.sumneko_lua.setup {
+lspconfig.lua_ls.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
