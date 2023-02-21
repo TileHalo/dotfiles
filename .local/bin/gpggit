@@ -1,0 +1,7 @@
+#!/bin/sh
+if [[ $DISPLAY ]]; then
+	exec gpg "$@"
+else
+	exec gpg --pinentry-mode loopback "$@"
+fi
+# vim: ft=sh
