@@ -1,0 +1,5 @@
+wmname LG3D
+xset -b off
+slstatus &
+export _JAVA_AWT_WM_NONREPARENTING=1
+xrandr --output DP-1 --right-of HDMI-1 --output HDMI-1 --primary --right-of eDP-1
