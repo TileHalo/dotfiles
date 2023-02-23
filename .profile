@@ -7,6 +7,7 @@ fi
 GOPATH="$HOME/go"
 PATH="/usr/local/go/bin/:$HOME/.cargo/bin:$HOME/go/bin/:$PATH"
 PATH="$HOME/.local/bin/:$HOME/scripts:$PATH"
+PATH="/opt/cisco/anyconnect/bin:$PATH"
 
 KICAD_SYMBOL_DIR="/usr/share/kicad/symbols/"
 

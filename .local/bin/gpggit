@@ -1,5 +1,5 @@
 #!/bin/sh
-if [[ $DISPLAY ]]; then
+if [[ -n $DISPLAY ]]; then
 	exec gpg "$@"
 else
 	exec gpg --pinentry-mode loopback "$@"
