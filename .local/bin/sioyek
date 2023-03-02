@@ -1,0 +1,6 @@
+#!/bin/sh
+
+
+flatpak run com.github.ahrm.sioyek "$@"
+
+# vim: ft=sh
