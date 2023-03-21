@@ -26,7 +26,7 @@ Far :gmail-remote:"[Gmail]/Sent Mail"
 Near :gmail-local:sent
 
 Channel gmail-trash
-Far :gmail-remote:"[Gmail]/Trash"
+Far :gmail-remote:"[Gmail]/Bin"
 Near :gmail-local:trash
 
 Group gmail

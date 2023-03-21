@@ -1,6 +1,16 @@
+#!/bin/sh
 wmname LG3D
 xset b off
 setxkbmap dvp
 slstatus &
+firefox &
+telegram-desktop &
 export _JAVA_AWT_WM_NONREPARENTING=1
-xrandr --output DisplayPort-3 --primary --right-of HDMI-A-3
+
+if [[ $(hostname) = "Sirius" ]]; then
+	xrandr --output DP-1 --right-of HDMI-1 --output HDMI-1 --primary --right-of eDP-1
+else
+	xrandr --output DisplayPort-3 --primary --right-of HDMI-A-3
+fi
+
+# vim: ft=sh
