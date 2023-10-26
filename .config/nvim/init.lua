@@ -70,6 +70,9 @@ vim.g.netrw_altv = 1
 vim.g.netrw_liststyle = 3
 vim.g.netrw_list_hide = "netrw_gitignore#Hide()"
 
+-- Some vimtex stuff
+vim.g.vimtex_view_method = "sioyek"
+
 -- Plugins
 require('plugins')
 vim.cmd('colorscheme solarized')
@@ -100,7 +103,7 @@ map['<S-Right>'] = ':vertical resize +1<cr>'
 
 -- Polyglot
 vim.g.polyglot_disabled = { "ftdetect", "sensible" };
-require 'Comment'.setup{}
+require 'Comment'.setup()
 
 require 'nvim-treesitter.configs'.setup {
   ensure_installed = {
@@ -110,6 +113,7 @@ require 'nvim-treesitter.configs'.setup {
     "bash",
     "bibtex",
     "make",
+    "c_sharp",
     "go",
     "latex",
     "toml",
@@ -139,6 +143,7 @@ require 'mason-lspconfig'.setup {
     'bashls',
     'gopls',
     'texlab',
+    'omnisharp',
     'lua_ls',
     'rust_analyzer',
     'pylsp',
@@ -154,6 +159,7 @@ require 'mason-tool-installer'.setup {
     'luacheck',
     'editorconfig-checker',
     'flake8',
+    'netcoredbg',
     'black',
     'goimports',
     'fixjson',
@@ -347,11 +353,6 @@ lspconfig.asm_lsp.setup {
   capabilities = capabilities,
 }
 
-require 'haskell-tools'.setup {
-  hls = {
-    on_attach = on_attach,
-  },
-}
 
 -- Manual lsp for vhdl_ls
 if not configs.rust_hdl then
@@ -376,8 +377,9 @@ rt.setup {
   server = {
     on_attach = function(_, bufnr)
       on_attach(_, bufnr)
-      local mml = map.nore.silent['buffer'..bufnr]
-      mml['K'] = '<Cmd>RustHoverActions<CR>'
+      vim.keymap.set("n", "K", rt.hover_actions.hover_actions, { buffer = bufnr })
+      -- Code action groups
+      vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
 
     end,
   }
@@ -402,7 +404,8 @@ require 'neogit'.setup {}
 -- Debugging
 
 require 'mason-nvim-dap'.setup {
-  ensure_installed = { 'python', 'delve', 'cpptools' }
+  ensure_installed = { 'python', 'delve', 'cpptools' },
+  automatic_installation = false
 }
 
 map.n['<leader>dk'] = '<Cmd>lua require("dap").continue()<CR>'

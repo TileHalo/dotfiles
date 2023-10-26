@@ -126,6 +126,9 @@ return require('packer').startup({ function(use)
     }
   }
 
+  -- Rust
+  use 'simrat39/rust-tools.nvim'
+
   -- Linting and formatting
   use 'mfussenegger/nvim-lint'
   use 'folke/neodev.nvim'
