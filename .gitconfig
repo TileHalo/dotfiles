@@ -15,11 +15,11 @@
 [pull]
 	rebase = true
 [commit]
-	gpgsign = true
+	; gpgsign = true
 [filter "lfs"]
 	process = git-lfs filter-process
 	required = true
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 [gpg]
-	program = /home/leo/.local/bin/gpggit
+	; program = /home/leo/.local/bin/gpggit

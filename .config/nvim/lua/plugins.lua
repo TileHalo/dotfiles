@@ -32,7 +32,7 @@ return require('packer').startup({ function(use)
 
 
   -- Telescope
-  use { 'nvim-telescope/telescope.nvim', tag = '0.1.0' }
+  use { 'nvim-telescope/telescope.nvim', tag = '0.1.6' }
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
   use 'luc-tielen/telescope_hoogle'
   use 'nvim-telescope/telescope-ui-select.nvim'
@@ -66,7 +66,11 @@ return require('packer').startup({ function(use)
 
   -- Debugging
   use 'mfussenegger/nvim-dap'
-  use 'rcarriga/nvim-dap-ui'
+  use {'rcarriga/nvim-dap-ui',
+    requires = {
+      { 'nvim-neotest/nvim-nio' }
+    }
+  }
   use 'theHamsta/nvim-dap-virtual-text'
 
 
@@ -90,8 +94,6 @@ return require('packer').startup({ function(use)
     'kosayoda/nvim-lightbulb',
     requires = 'antoinemadec/FixCursorHold.nvim',
   }
-
-  use { 'simrat39/rust-tools.nvim'}
 
   -- Comment generation
   use { 'danymat/neogen', requires = 'nvim-treesitter/nvim-treesitter' }
@@ -143,7 +145,7 @@ return require('packer').startup({ function(use)
   use {
     'romgrk/barbar.nvim',
 
-    requires = { 'kyazdani42/nvim-web-devicons' }
+    requires = { 'nvim-tree/nvim-web-devicons', 'lewis6991/gitsigns.nvim' },
   }
   use {
     'sudormrfbin/cheatsheet.nvim',
