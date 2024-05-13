@@ -117,7 +117,7 @@ return require('packer').startup({ function(use)
   use 'neomake/neomake'
 
   -- Latex
-  use 'lervag/vimtex'
+  use {'lervag/vimtex', tag = 'v2.15'}
 
   -- Haskell
   use {
