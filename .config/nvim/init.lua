@@ -72,9 +72,27 @@ vim.g.netrw_list_hide = "netrw_gitignore#Hide()"
 
 -- Some vimtex stuff
 vim.g.vimtex_view_method = "sioyek"
+vim.g.polyglot_disabled = { "ftdetect", "sensible" };
+vim.g.snips_author = string.gsub(vim.fn.system("git config user.name"), "[\r\n]", "")
+vim.g.snips_email = string.gsub(vim.fn.system("git config user.email"), "[\r\n]", "")
+vim.g.snips_github = "https://github.com/TileHalo"
 
 -- Plugins
-require('plugins')
+
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+require("lazy").setup("plugins")
 vim.cmd('colorscheme solarized')
 
 vim.notify = require 'notify'
@@ -102,10 +120,13 @@ map['<S-Up>'] = ':resize -1<cr>'
 map['<S-Right>'] = ':vertical resize +1<cr>'
 
 -- Polyglot
-vim.g.polyglot_disabled = { "ftdetect", "sensible" };
 require 'Comment'.setup()
 
 require 'nvim-treesitter.configs'.setup {
+  sync_install = false,
+  auto_install = false,
+  ignore_install = { "javascript" },
+  modules = {},
   ensure_installed = {
     "c",
     "lua",
@@ -119,7 +140,9 @@ require 'nvim-treesitter.configs'.setup {
     "toml",
     "verilog",
     "yaml",
-    "vim"
+    "vim",
+    "vimdoc",
+    "python",
   },
   highlight = {
     enable = true,
@@ -334,6 +357,25 @@ lspconfig.pylsp.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
+  settings = {
+    pylsp = {
+      plugins = {
+        black = { enabled = true },
+        autopep8 = { enabled = false },
+        yapf = { enabled = false },
+        -- linter options
+        pylint = { enabled = true, executable = "pylint" },
+        pyflakes = { enabled = false },
+        pycodestyle = { enabled = false },
+        -- type checker
+        pylsp_mypy = { enabled = true },
+        -- auto-completion options
+        jedi_completion = { fuzzy = true },
+        -- import sorting
+        pyls_isort = { enabled = true },
+      },
+    },
+  },
 }
 lspconfig.arduino_language_server.setup {
   on_attach = on_attach,

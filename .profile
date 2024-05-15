@@ -10,6 +10,15 @@ function matlab() {
 	export LD_LIBRARY_PATH=/usr/lib/xorg/modules/dri;
 	/usr/local/bin/matlab
 }
+function penv() {
+	python -m venv venv &&
+	source venv/bin/activate
+}
+function sv() {
+    source venv/bin/activate &&
+    tmux set-environment VIRTUAL_ENV $VIRTUAL_ENV
+}
+
 
 GOPATH="$HOME/go"
 PATH="/usr/local/go/bin:$HOME/.cargo/bin:$HOME/go/bin:$PATH"
@@ -25,3 +34,7 @@ HOST=`hostname`
 PS1="[ ${HOST} :: ${USER} ] "
 export PS1 NVM_DIR GOPATH PATH AURHOME EDITOR GHCUP_INSTALL_BASE_PREFIX
 export KICAD_SYMBOL_DIR
+
+if [ -n "$VIRTUAL_ENV" ]; then
+    source $VIRTUAL_ENV/bin/activate;
+fi
