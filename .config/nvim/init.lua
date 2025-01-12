@@ -33,27 +33,27 @@ augroup ftdetect
 augroup END
   ]])
 
-vim.opt.diffopt  = vim.opt.diffopt + "algorithm:patience"
-vim.opt.path = vim.opt.path + "**"
-vim.opt.shortmess = vim.opt.shortmess + "A"
+vim.opt.diffopt        = vim.opt.diffopt + "algorithm:patience"
+vim.opt.path           = vim.opt.path + "**"
+vim.opt.shortmess      = vim.opt.shortmess + "A"
 
-vim.opt.number = true
+vim.opt.number         = true
 vim.opt.relativenumber = true
-vim.opt.showcmd = true
-vim.opt.lazyredraw = true
-vim.opt.cursorline = true
-vim.opt.wildmenu = true
-vim.opt.showmatch = true
-vim.opt.breakindent = true
-vim.opt.list = true
-vim.opt.smartindent = true
-vim.opt.autoindent = true
-vim.opt.incsearch = true
-vim.opt.hlsearch = true
-vim.opt.smartcase = true
-vim.opt.browsedir = 'buffer'
+vim.opt.showcmd        = true
+vim.opt.lazyredraw     = true
+vim.opt.cursorline     = true
+vim.opt.wildmenu       = true
+vim.opt.showmatch      = true
+vim.opt.breakindent    = true
+vim.opt.list           = true
+vim.opt.smartindent    = true
+vim.opt.autoindent     = true
+vim.opt.incsearch      = true
+vim.opt.hlsearch       = true
+vim.opt.smartcase      = true
+-- vim.opt.browsedir = 'buffer'
 
-vim.opt.termguicolors = true
+vim.opt.termguicolors  = true
 
 
 -- File browser
@@ -72,6 +72,13 @@ vim.g.netrw_list_hide = "netrw_gitignore#Hide()"
 
 -- Some vimtex stuff
 vim.g.vimtex_view_method = "sioyek"
+
+vim.cmd([[
+let g:vimtex_quickfix_ignore_filters = [
+\ "Overfull",
+\ "Underfull",
+\]
+]])
 vim.g.polyglot_disabled = { "ftdetect", "sensible" };
 vim.g.snips_author = string.gsub(vim.fn.system("git config user.name"), "[\r\n]", "")
 vim.g.snips_email = string.gsub(vim.fn.system("git config user.email"), "[\r\n]", "")
@@ -104,7 +111,6 @@ local util = require 'packer.util'
 local snippath = util.join_paths(vim.fn.stdpath('data'), 'site', 'pack')
 local dap = require('dap')
 local dapui = require('dapui')
-local rt = require('rust-tools')
 local path = require "mason-core.path"
 local lspconfig = require 'lspconfig'
 local configs = require 'lspconfig.configs'
@@ -112,9 +118,9 @@ local configs = require 'lspconfig.configs'
 -- Basic keybindings
 map.n.nore.silent['<leader><leader>'] = ':nohlsearch<CR>'
 map.n.nore.silent['<leader>cd'] = ':lcd %:h<CR>'
-map.n.nore.silent['bt'] = ':bNext<CR>'
+map.n.nore.silent['bt'] = ':bnext<CR>'
 map.n.nore.silent['bT'] = ':bprevious<CR>'
-map['<S-Left>'] =  ':vertical resize -1<cr>'
+map['<S-Left>'] = ':vertical resize -1<cr>'
 map['<S-Down>'] = ':resize +1<cr>'
 map['<S-Up>'] = ':resize -1<cr>'
 map['<S-Right>'] = ':vertical resize +1<cr>'
@@ -153,6 +159,21 @@ require 'nvim-treesitter.configs'.setup {
     disable = { "c" }
   }
 }
+require 'treesitter-context'.setup {
+  enable = true,           -- Enable this plugin (Can be enabled/disabled later via commands)
+  multiwindow = false,     -- Enable multiwindow support.
+  max_lines = 0,           -- How many lines the window should span. Values <= 0 mean no limit.
+  min_window_height = 0,   -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+  line_numbers = true,
+  multiline_threshold = 3, -- Maximum number of lines to show for a single context
+  trim_scope = 'outer',    -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+  mode = 'cursor',         -- Line used to calculate context. Choices: 'cursor', 'topline'
+  -- Separator between context and content. Should be a single character string, like '-'.
+  -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+  separator = nil,
+  zindex = 20,     -- The Z-index of the context window
+  on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+}
 -- Automatically install LSP and other good stuff
 require 'mason'.setup {
   ui = {
@@ -162,27 +183,22 @@ require 'mason'.setup {
 
 require 'mason-lspconfig'.setup {
   ensure_installed = {
-    'clangd',
     'bashls',
     'gopls',
     'texlab',
-    'omnisharp',
     'lua_ls',
     'rust_analyzer',
     'pylsp',
-    'arduino_language_server',
   },
 }
 
 require 'mason-tool-installer'.setup {
   ensure_installed = {
-    'cpptools',
     'debugpy',
     'bash-debug-adapter',
     'luacheck',
     'editorconfig-checker',
     'flake8',
-    'netcoredbg',
     'black',
     'goimports',
     'fixjson',
@@ -266,13 +282,19 @@ require "cmp".setup.filetype({ "tex", "plaintex" }, {
 
 
 snippath = util.join_paths(snippath, 'packer', 'start', 'vim-snippets')
+
+local ls = require("luasnip")
+
 require 'luasnip.loaders.from_snipmate'.lazy_load({ path = snippath })
-map.i.expr.silent['<Tab>'] = 'luasnip#expand_or_jumpable() ?' ..
-                            '"<Plug>luasnip-expand-or-jump" : "<Tab>"'
-map.i.s.nore.silent['<S-Tab>'] = '<cmd>lua require("luasnip").jump(-1)<Cr>'
-map.s.nore.silent['<Tab>'] = '<cmd>lua require("luasnip").jump(1)<Cr>'
-map.i.s.expr.silent['<C-E>'] = 'luasnip#choice_active() ?' ..
-                               '"<Plug>luasnip-next-choice" : "<C-E>"'
+vim.keymap.set({ "i" }, "<C-h>", function() ls.expand() end, { silent = true })
+vim.keymap.set({ "i", "s" }, "<C-L>", function() ls.jump(1) end, { silent = true })
+vim.keymap.set({ "i", "s" }, "<C-J>", function() ls.jump(-1) end, { silent = true })
+
+vim.keymap.set({ "i", "s" }, "<C-E>", function()
+  if ls.choice_active() then
+    ls.change_choice(1)
+  end
+end, { silent = true })
 
 -- Set up lspconfig.
 local capabilities = require('cmp_nvim_lsp')
@@ -293,7 +315,7 @@ local on_attach = function(_, bufnr)
 
   -- Mappings.
   -- See `:help vim.lsp.*` for documentation on any of the below functions
-  local mml = map.nore.silent['buffer'..bufnr]
+  local mml = map.nore.silent['buffer' .. bufnr]
   mml['gD'] = '<Cmd>lua vim.lsp.buf.declaration()<CR>'
   mml['gd'] = '<Cmd>lua vim.lsp.buf.definition()<CR>'
   mml['K'] = '<Cmd>lua vim.lsp.buf.hover()<CR>'
@@ -302,7 +324,7 @@ local on_attach = function(_, bufnr)
   mml['<leader>wa'] = '<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>'
   mml['<leader>wr'] = '<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>'
   mml['<leader>wl'] = '<Cmd>lua print(vim.inspect(vim.lsp.buf' ..
-                      '.list_workspace_folders()))<CR>'
+      '.list_workspace_folders()))<CR>'
   mml['<leader>D'] = '<Cmd>lua vim.lsp.buf.type_definition()<CR>'
   mml['<leader>rn'] = '<Cmd>lua vim.lsp.buf.rename()<CR>'
   mml['<leader>ca'] = '<Cmd>lua vim.lsp.buf.code_action()<CR>'
@@ -319,7 +341,7 @@ lspconfig.clangd.setup {
   on_attach = on_attach,
   flags = lsp_flags,
   capabilities = capabilities,
-  filetypes = {'cpp', 'objc', 'objcpp', 'cuda', 'proto' }
+  filetypes = { 'cpp', 'objc', 'objcpp', 'cuda', 'proto' }
 }
 lspconfig.bashls.setup {
   on_attach = on_attach,
@@ -363,8 +385,10 @@ lspconfig.pylsp.setup {
         black = { enabled = true },
         autopep8 = { enabled = false },
         yapf = { enabled = false },
+        mccabe = { enabled = true },
         -- linter options
-        pylint = { enabled = true, executable = "pylint" },
+        pylint = { enabled = false, executable = "pylint" },
+        flake8 = { enabled = true, maxLineLength = 88 },
         pyflakes = { enabled = false },
         pycodestyle = { enabled = false },
         -- type checker
@@ -395,37 +419,44 @@ lspconfig.asm_lsp.setup {
   capabilities = capabilities,
 }
 
+vim.g.rustaceanvim = {
+  -- Plugin configuration
+  tools = {
+  },
+  -- LSP configuration
+  server = {
+    on_attach = function(client, bufnr)
+      -- you can also put keymaps in here
+    end,
+    default_settings = {
+      -- rust-analyzer language server configuration
+      ['rust-analyzer'] = {
+        diagnostics = {
+          enable = true,
+          refreshSupport = false,
+          disabled = { "unresolved-proc-macro" },
+          enableExperimental = true,
+        },
+      },
+    },
+  },
+  -- DAP configuration
+  dap = {
+  },
+}
+
 
 -- Manual lsp for vhdl_ls
 if not configs.rust_hdl then
   configs.rust_hdl = {
     default_config = {
-      cmd = {'vhdl_ls'};
-      filetypes = { "vhdl" };
+      cmd = { 'vhdl_ls' },
+      filetypes = { "vhdl" },
       root_dir = require 'lspconfig.util'.find_git_ancestor,
-      settings = {};
-    };
+      settings = {},
+    },
   }
 end
-
--- lspconfig.rust_hdl.setup {
---   on_attach = on_attach,
---   flags = lsp_flags,
---   capabilities = capabilities,
--- }
-
-
-rt.setup {
-  server = {
-    on_attach = function(_, bufnr)
-      on_attach(_, bufnr)
-      vim.keymap.set("n", "K", rt.hover_actions.hover_actions, { buffer = bufnr })
-      -- Code action groups
-      vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
-
-    end,
-  }
-}
 
 require 'lsp_signature'.setup {
   bind = true,
@@ -453,10 +484,12 @@ require 'mason-nvim-dap'.setup {
 map.n['<leader>dk'] = '<Cmd>lua require("dap").continue()<CR>'
 map.n['<leader>dl'] = '<Cmd>lua require("dap").run_last()<CR>'
 map.n['<leader>b'] = '<Cmd>lua require("dap").toggle_breakpoint()<CR>'
-map.n['<F2'] = '<Cmd>lua require("dapui").toggle({})<CR>'
+map.n['<F2>'] = '<Cmd>lua require("dapui").toggle({})<CR>'
 map.n['<leader>n'] = '<Cmd>lua require("dap").step_over()<CR>'
 map.n['<leader>s'] = '<Cmd>lua require("dap").step_into()<CR>'
-map.n['<F7'] = '<Cmd>lua require("dap").step_out()<CR>'
+map.n['<F5>'] = '<Cmd>lua require("dap").step_over()<CR>'
+map.n['<F6>'] = '<Cmd>lua require("dap").step_into()<CR>'
+map.n['<F7>'] = '<Cmd>lua require("dap").step_out()<CR>'
 
 vim.fn.sign_define('DapBreakpoint', { text = '🛑', texthl = '', linehl = '', numhl = '' })
 
@@ -497,8 +530,8 @@ dapui.setup {
     enabled = false,
   },
   floating = {
-    max_height = nil, -- These can be integers or a float between 0 and 1.
-    max_width = nil, -- Floats will be treated as percentage of your screen.
+    max_height = nil,  -- These can be integers or a float between 0 and 1.
+    max_width = nil,   -- Floats will be treated as percentage of your screen.
     border = "single", -- Border style. Can be "single", "double" or "rounded"
     mappings = {
       close = { "q", "<Esc>" },
@@ -549,7 +582,6 @@ dap.configurations.c = {
 }
 
 dap.configurations.cpp = dap.configurations.c
-dap.configurations.rust = dap.configurations.c
 require 'nvim-dap-virtual-text'.setup {}
 
 require 'texview'.texview()
@@ -565,7 +597,7 @@ vim.diagnostic.config({
   virtual_text = {
     format = function(diagnostic)
       local message =
-      diagnostic.message:gsub("\n", " "):gsub("\t", " "):gsub("%s+", " "):gsub("^%s+", "")
+          diagnostic.message:gsub("\n", " "):gsub("\t", " "):gsub("%s+", " "):gsub("^%s+", "")
       return message
     end,
   },
@@ -580,7 +612,6 @@ require 'neotest'.setup {
     require 'neotest-python',
     require 'neotest-go',
     require 'neotest-rust',
-    require 'neotest-haskell'
   }
 }
 
@@ -599,7 +630,7 @@ map.n.nore.silent['<Leader>cF'] = string.format(neogencmd, 'file')
 require 'lint'.linters_by_ft = {
   markdown = {},
 }
-vim.api.nvim_create_augroup("linter", {clear = true})
+vim.api.nvim_create_augroup("linter", { clear = true })
 vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
   group = "linter",
   callback = function()

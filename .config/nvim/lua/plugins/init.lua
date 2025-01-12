@@ -13,11 +13,12 @@ return {
 
 
   -- Telescope
-  { 'nvim-telescope/telescope.nvim', version = '0.1.6' },
+  { 'nvim-telescope/telescope.nvim',            version = '0.1.8' },
   { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
   'luc-tielen/telescope_hoogle',
   'nvim-telescope/telescope-ui-select.nvim',
-  { 'LinArcX/telescope-ports.nvim',
+  {
+    'LinArcX/telescope-ports.nvim',
     dependencies = {
       { 'rcarriga/nvim-notify', branch = 'master' },
     },
@@ -31,8 +32,8 @@ return {
   'm-demare/hlargs.nvim',
 
   {
-      'numToStr/Comment.nvim',
-      lazy = false,
+    'numToStr/Comment.nvim',
+    lazy = false,
   },
   'jghauser/mkdir.nvim',
   'nvim-lualine/lualine.nvim',
@@ -45,16 +46,22 @@ return {
 
   -- Debugging
   'mfussenegger/nvim-dap',
-  {'rcarriga/nvim-dap-ui',
+  {
+    'rcarriga/nvim-dap-ui',
     dependencies = {
       { 'nvim-neotest/nvim-nio' },
     },
   },
   'theHamsta/nvim-dap-virtual-text',
 
-
+  {
+    "L3MON4D3/LuaSnip",
+    -- follow latest release.
+    version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+    -- install jsregexp (optional!).
+    build = "make install_jsregexp"
+  },
   -- Completion, snippets and LSP
-  'L3MON4D3/LuaSnip',
   'honza/vim-snippets',
   'amarakon/nvim-cmp-lua-latex-symbols',
   'hrsh7th/cmp-buffer',
@@ -88,7 +95,6 @@ return {
       'nvim-neotest/neotest-python',
       'nvim-neotest/neotest-go',
       'rouge8/neotest-rust',
-      'MrcJkb/neotest-haskell',
     },
   },
 
@@ -96,19 +102,15 @@ return {
   'neomake/neomake',
 
   -- Latex
-  {'lervag/vimtex', version = 'v2.15'},
+  { 'lervag/vimtex',  version = 'v2.15' },
 
-  -- Haskell
-  {
-    'MrcJkb/haskell-tools.nvim',
-
-    dependencies = {
-      'neovim/nvim-lspconfig',
-    },
-  },
 
   -- Rust
-  'simrat39/rust-tools.nvim',
+  {
+    'mrcjkb/rustaceanvim',
+    version = '^5',
+    lazy = false,
+  },
 
   -- Linting and formatting
   'mfussenegger/nvim-lint',
@@ -137,9 +139,20 @@ return {
   },
 
   -- git
-  { 'TimUntersberger/neogit', dependencies = 'nvim-lua/plenary.nvim' },
+  {
+    "NeogitOrg/neogit",
+    dependencies = {
+      "nvim-lua/plenary.nvim",  -- required
+      "sindrets/diffview.nvim", -- optional - Diff integration
 
-  { 'junegunn/fzf',
+      -- Only one of these is needed, not both.
+      "nvim-telescope/telescope.nvim", -- optional
+      "ibhagwan/fzf-lua",              -- optional
+    },
+    config = true
+  },
+  {
+    'junegunn/fzf',
     build = function()
       vim.fn['fzf#install']()
     end

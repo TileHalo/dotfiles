@@ -1,0 +1,11 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =9
+let g:netrw_dirhist_9='tracing'
+let g:netrw_dirhist_8='/home/leo/school/ELEC-C3240/vko2'
+let g:netrw_dirhist_7='/home/leo/.config/nvim/ftdetect'
+let g:netrw_dirhist_6='/home/leo'
+let g:netrw_dirhist_5='/home/leo/go/src/github.com/TileHalo/tupa3/xml'
+let g:netrw_dirhist_4='/home/leo/go/src/github.com/TileHalo/tupa3'
+let g:netrw_dirhist_3='/home/leo/go/src/github.com/TileHalo/tupa3/migrations'
+let g:netrw_dirhist_2='/home/leo/go/src/github.com/TileHalo/tupa3/migrations/20190921090504_updated'
+let g:netrw_dirhist_1='/home/leo/code/games/sk/src/main'
