@@ -29,7 +29,18 @@ return {
   'ishan9299/nvim-solarized-lua',
   'nvim-treesitter/nvim-treesitter',
   'nvim-treesitter/nvim-treesitter-context',
+  'nvim-treesitter/nvim-treesitter-textobjects',
   'm-demare/hlargs.nvim',
+
+  {
+    "romus204/referencer.nvim",
+  },
+
+  {
+    'mawkler/refjump.nvim',
+    event = 'LspAttach', -- Uncomment to lazy load
+    opts = {}
+  },
 
   {
     'numToStr/Comment.nvim',
@@ -39,10 +50,10 @@ return {
   'nvim-lualine/lualine.nvim',
 
   -- Mason
-  'williamboman/mason.nvim',
-  'jayp0521/mason-nvim-dap',
-  'williamboman/mason-lspconfig.nvim',
-  'WhoIsSethDaniel/mason-tool-installer.nvim',
+  'mason-org/mason.nvim',
+  -- 'jayp0521/mason-nvim-dap',
+  'mason-org/mason-lspconfig.nvim',
+  -- 'WhoIsSethDaniel/mason-tool-installer.nvim',
 
   -- Debugging
   'mfussenegger/nvim-dap',
@@ -75,11 +86,6 @@ return {
   'onsails/lspkind.nvim',
   'ray-x/lsp_signature.nvim',
   'junegunn/vim-easy-align',
-  'simrat39/symbols-outline.nvim',
-  {
-    'kosayoda/nvim-lightbulb',
-    dependencies = 'antoinemadec/FixCursorHold.nvim',
-  },
 
   -- Comment generation
   { 'danymat/neogen', dependencies = 'nvim-treesitter/nvim-treesitter' },
@@ -108,13 +114,16 @@ return {
   -- Rust
   {
     'mrcjkb/rustaceanvim',
-    version = '^5',
+    version = '^6',
     lazy = false,
   },
 
   -- Linting and formatting
   'mfussenegger/nvim-lint',
-  'folke/neodev.nvim',
+  {
+    'folke/lazydev.nvim',
+    ft = 'lua',
+  },
 
   -- Various utilities
   'gennaro-tedesco/nvim-peekup',

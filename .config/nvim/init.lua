@@ -7,6 +7,7 @@ vim.g.maplocalleader = ","
 vim.opt.shiftwidth = 8
 vim.opt.tabstop = 8
 
+
 -- Persistent undo
 vim.opt.undofile = true
 vim.opt.undolevels = 500
@@ -140,11 +141,9 @@ require 'nvim-treesitter.configs'.setup {
     "bash",
     "bibtex",
     "make",
-    "c_sharp",
     "go",
     "latex",
     "toml",
-    "verilog",
     "yaml",
     "vim",
     "vimdoc",
@@ -157,7 +156,51 @@ require 'nvim-treesitter.configs'.setup {
   indent = {
     enable = true,
     disable = { "c" }
-  }
+  },
+
+  textobjects = {
+    select = {
+      enable = true,
+
+      -- Automatically jump forward to textobj, similar to targets.vim
+      lookahead = true,
+
+      keymaps = {
+        -- You can use the capture groups defined in textobjects.scm
+        ["af"] = "@function.outer",
+        ["if"] = "@function.inner",
+        ["ac"] = "@class.outer",
+        -- You can optionally set descriptions to the mappings (used in the desc parameter of
+        -- nvim_buf_set_keymap) which plugins like which-key display
+        ["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
+        -- You can also use captures from other query groups like `locals.scm`
+        ["as"] = { query = "@local.scope", query_group = "locals", desc = "Select language scope" },
+      },
+      -- You can choose the select mode (default is charwise 'v')
+      --
+      -- Can also be a function which gets passed a table with the keys
+      -- * query_string: eg '@function.inner'
+      -- * method: eg 'v' or 'o'
+      -- and should return the mode ('v', 'V', or '<c-v>') or a table
+      -- mapping query_strings to modes.
+      selection_modes = {
+        ['@parameter.outer'] = 'v', -- charwise
+        ['@function.outer'] = 'V',  -- linewise
+        ['@class.outer'] = '<c-v>', -- blockwise
+      },
+      -- If you set this to `true` (default is `false`) then any textobject is
+      -- extended to include preceding or succeeding whitespace. Succeeding
+      -- whitespace has priority in order to act similarly to eg the built-in
+      -- `ap`.
+      --
+      -- Can also be a function which gets passed a table with the keys
+      -- * query_string: eg '@function.inner'
+      -- * selection_mode: eg 'v'
+      -- and should return true or false
+      include_surrounding_whitespace = true,
+    },
+  },
+
 }
 require 'treesitter-context'.setup {
   enable = true,           -- Enable this plugin (Can be enabled/disabled later via commands)
@@ -184,7 +227,6 @@ require 'mason'.setup {
 require 'mason-lspconfig'.setup {
   ensure_installed = {
     'bashls',
-    'gopls',
     'texlab',
     'lua_ls',
     'rust_analyzer',
@@ -192,21 +234,23 @@ require 'mason-lspconfig'.setup {
   },
 }
 
-require 'mason-tool-installer'.setup {
-  ensure_installed = {
-    'debugpy',
-    'bash-debug-adapter',
-    'luacheck',
-    'editorconfig-checker',
-    'flake8',
-    'black',
-    'goimports',
-    'fixjson',
-    'beautysh'
-  },
-  auto_update = false,
-  run_on_start = true
-}
+require 'referencer'.setup {}
+
+-- require 'mason-tool-installer'.setup {
+--   ensure_installed = {
+--     'debugpy',
+--     'bash-debug-adapter',
+--     'luacheck',
+--     'editorconfig-checker',
+--     'flake8',
+--     'black',
+--     'goimports',
+--     'fixjson',
+--     'beautysh'
+--   },
+--   auto_update = false,
+--   run_on_start = true
+-- }
 
 
 
@@ -301,7 +345,7 @@ local capabilities = require('cmp_nvim_lsp')
     .default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 -- Lsp configs
-require 'neodev'.setup {}
+require 'lazydev'.setup {}
 map.n.nore.silent['<leader>e'] = '<Cmd>lua vim.diagnostic.open_float()<CR>'
 map.n.nore.silent['[d'] = '<Cmd>lua vim.diagnostic.goto_prev()<CR>'
 map.n.nore.silent[']d'] = '<Cmd>lua vim.diagnostic.goto_next()<CR>'
@@ -311,7 +355,7 @@ map.n.nore.silent['<leader>q'] = '<Cmd>lua vim.diagnostic.setloclist()<CR>'
 -- after the language server attaches to the current buffer
 local on_attach = function(_, bufnr)
   -- Enable completion triggered by <c-x><c-o>
-  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+  vim.api.nvim_set_option_value('omnifunc', 'v:lua.vim.lsp.omnifunc', { buf = bufnr })
 
   -- Mappings.
   -- See `:help vim.lsp.*` for documentation on any of the below functions
@@ -446,24 +490,12 @@ vim.g.rustaceanvim = {
 }
 
 
--- Manual lsp for vhdl_ls
-if not configs.rust_hdl then
-  configs.rust_hdl = {
-    default_config = {
-      cmd = { 'vhdl_ls' },
-      filetypes = { "vhdl" },
-      root_dir = require 'lspconfig.util'.find_git_ancestor,
-      settings = {},
-    },
-  }
-end
-
-require 'lsp_signature'.setup {
-  bind = true,
-  handler_opts = {
-    border = "rounded"
-  }
-}
+-- require 'lsp_signature'.setup {
+--   bind = true,
+--   handler_opts = {
+--     border = "rounded"
+--   }
+-- }
 
 
 require 'lualine'.setup {
@@ -476,10 +508,10 @@ require 'neogit'.setup {}
 
 -- Debugging
 
-require 'mason-nvim-dap'.setup {
-  ensure_installed = { 'python', 'delve', 'cpptools' },
-  automatic_installation = false
-}
+-- require 'mason-nvim-dap'.setup {
+--   ensure_installed = { 'python', 'delve', 'cpptools' },
+--   automatic_installation = false
+-- }
 
 map.n['<leader>dk'] = '<Cmd>lua require("dap").continue()<CR>'
 map.n['<leader>dl'] = '<Cmd>lua require("dap").run_last()<CR>'
@@ -602,9 +634,9 @@ vim.diagnostic.config({
     end,
   },
 }, neotest_ns)
-map.n.nore['<leader>nr'] = 'require("neotest").run.run()'
-map.n.nore['<leader>no'] = 'require("neotest").output.open()'
-map.n.nore['<leader>ns'] = 'require("neotest").summary.toggle()'
+map.n.nore['<leader>nr'] = '<Cmd>lua require("neotest").run.run()<CR>'
+map.n.nore['<leader>no'] = '<Cmd>lua require("neotest").output.open()<CR>'
+map.n.nore['<leader>ns'] = '<Cmd>lua require("neotest").summary.toggle()<CR>'
 
 require 'coverage'.setup {}
 require 'neotest'.setup {
@@ -667,8 +699,7 @@ require 'telescope'.load_extension('notify')
 
 require 'nvim-surround'.setup {}
 
-require 'symbols-outline'.setup {}
-require 'nvim-lightbulb'.setup { autocmd = { enabled = true } }
+-- require 'nvim-lightbulb'.setup { autocmd = { enabled = true } }
 
 map.x.n['ga'] = '<Plug>(EasyAlign)'
 
