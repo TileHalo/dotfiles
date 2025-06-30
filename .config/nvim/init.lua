@@ -73,6 +73,9 @@ vim.g.netrw_list_hide = "netrw_gitignore#Hide()"
 
 -- Some vimtex stuff
 vim.g.vimtex_view_method = "sioyek"
+if vim.fn.has("wsl") == 1 then
+  vim.g.vimtex_view_enabled = "false"
+end
 
 vim.cmd([[
 let g:vimtex_quickfix_ignore_filters = [
@@ -108,13 +111,11 @@ local map = require 'cartographer'
 local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 local cmp = require('cmp')
 local lspkind = require('lspkind')
-local util = require 'packer.util'
-local snippath = util.join_paths(vim.fn.stdpath('data'), 'site', 'pack')
 local dap = require('dap')
 local dapui = require('dapui')
 local path = require "mason-core.path"
 local lspconfig = require 'lspconfig'
-local configs = require 'lspconfig.configs'
+-- local configs = require 'lspconfig.configs'
 
 -- Basic keybindings
 map.n.nore.silent['<leader><leader>'] = ':nohlsearch<CR>'
@@ -229,7 +230,6 @@ require 'mason-lspconfig'.setup {
     'bashls',
     'texlab',
     'lua_ls',
-    'rust_analyzer',
     'pylsp',
   },
 }
@@ -325,9 +325,10 @@ require "cmp".setup.filetype({ "tex", "plaintex" }, {
 })
 
 
-snippath = util.join_paths(snippath, 'packer', 'start', 'vim-snippets')
 
 local ls = require("luasnip")
+
+local snippath = "$HOME/.local/share/nvim/lazy/vim-snippets/snippets"
 
 require 'luasnip.loaders.from_snipmate'.lazy_load({ path = snippath })
 vim.keymap.set({ "i" }, "<C-h>", function() ls.expand() end, { silent = true })
@@ -413,11 +414,6 @@ lspconfig.lua_ls.setup {
       }
     }
   }
-}
-lspconfig.svls.setup {
-  on_attach = on_attach,
-  flags = lsp_flags,
-  capabilities = capabilities,
 }
 lspconfig.pylsp.setup {
   on_attach = on_attach,

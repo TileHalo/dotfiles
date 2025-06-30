@@ -22,7 +22,7 @@ function sv() {
 
 
 GOPATH="$HOME/go"
-PATH="/usr/local/go/bin:$HOME/.cargo/bin:$HOME/go/bin:$PATH"
+PATH="$HOME/.npm-packages/bin:/usr/local/go/bin:$HOME/.cargo/bin:$HOME/go/bin:$PATH"
 PATH="$HOME/.local/bin:$HOME/scripts:$PATH"
 PATH="/opt/cisco/anyconnect/bin:$PATH"
 MYVIMRC="$HOME/.config/nvim/init.lua"
