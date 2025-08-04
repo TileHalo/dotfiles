@@ -29,6 +29,7 @@ MYVIMRC="$HOME/.config/nvim/init.lua"
 MYVIMPLUGS="$HOME/.config/nvim/lua/plugins/init.lua"
 SSH_AGENT_PID=""
 SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/gnupg/S.gpg-agent.ssh"
+PYTHONPATH=${PYTHONPATH}:/usr/local/lib
 
 KICAD_SYMBOL_DIR="/usr/share/kicad/symbols/"
 
@@ -39,6 +40,7 @@ HOST=`hostname`
 PS1="[ ${HOST} :: ${USER} ] "
 export PS1 NVM_DIR GOPATH PATH AURHOME EDITOR GHCUP_INSTALL_BASE_PREFIX
 export KICAD_SYMBOL_DIR MYVIMRC MYVIMPLUGS SSH_AGENT_PID SSH_AUTH_SOCK
+export PYTHONPATH
 
 if [ -n "$VIRTUAL_ENV" ]; then
     source $VIRTUAL_ENV/bin/activate;

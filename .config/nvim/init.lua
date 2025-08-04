@@ -225,15 +225,15 @@ require 'mason'.setup {
   }
 }
 
-require 'mason-lspconfig'.setup {
-  ensure_installed = {
-    'bashls',
-    'texlab',
-    'lua_ls',
-    'pylsp',
-  },
-}
-
+-- require 'mason-lspconfig'.setup {
+--   ensure_installed = {
+--     'bashls',
+--     'texlab',
+--     'lua_ls',
+--     'pylsp',
+--   },
+-- }
+--
 require 'referencer'.setup {}
 
 -- require 'mason-tool-installer'.setup {

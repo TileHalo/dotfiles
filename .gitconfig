@@ -1,6 +1,6 @@
 [user]
 	name = Leo Lahti
-	email = leo@lahti.pw
+	email = leo.m.lahti@aalto.fi
 
 [init]
 	defaultBranch = main
@@ -12,6 +12,7 @@
 [alias]
 	ctags = !.git/hooks/ctags
 	cscope = !.git/hooks/cscope
+	alog = log --graph --oneline --all --decorate
 [pull]
 	rebase = true
 [commit]
