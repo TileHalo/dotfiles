@@ -52,7 +52,10 @@ return {
   -- Mason
   'mason-org/mason.nvim',
   -- 'jayp0521/mason-nvim-dap',
+  {
   'mason-org/mason-lspconfig.nvim',
+  dependencies = {'neovim/nvim-lspconfig'},
+  },
   -- 'WhoIsSethDaniel/mason-tool-installer.nvim',
 
   -- Debugging
@@ -82,7 +85,6 @@ return {
   'hrsh7th/cmp-path',
   'saadparwaiz1/cmp_luasnip',
   'hrsh7th/nvim-cmp',
-  'neovim/nvim-lspconfig',
   'onsails/lspkind.nvim',
   'ray-x/lsp_signature.nvim',
   'junegunn/vim-easy-align',

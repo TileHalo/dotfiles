@@ -114,7 +114,6 @@ local lspkind = require('lspkind')
 local dap = require('dap')
 local dapui = require('dapui')
 local path = require "mason-core.path"
-local lspconfig = require 'lspconfig'
 -- local configs = require 'lspconfig.configs'
 
 -- Basic keybindings
@@ -225,15 +224,17 @@ require 'mason'.setup {
   }
 }
 
--- require 'mason-lspconfig'.setup {
---   ensure_installed = {
---     'bashls',
---     'texlab',
---     'lua_ls',
---     'pylsp',
---   },
--- }
---
+require 'mason-lspconfig'.setup {
+  ensure_installed = {
+    'bashls',
+    'clangd',
+    'texlab',
+    'lua_ls',
+    'pylsp',
+  },
+}
+
+vim.lsp.enable("djlsp")
 require 'referencer'.setup {}
 
 -- require 'mason-tool-installer'.setup {
@@ -382,82 +383,10 @@ local lsp_flags = {
   debounce_text_changes = 150,
 }
 
-lspconfig.clangd.setup {
-  on_attach = on_attach,
-  flags = lsp_flags,
+vim.lsp.config('*', {
   capabilities = capabilities,
-  filetypes = { 'cpp', 'objc', 'objcpp', 'cuda', 'proto' }
-}
-lspconfig.bashls.setup {
-  on_attach = on_attach,
-  flags = lsp_flags,
-  capabilities = capabilities,
-}
-lspconfig.gopls.setup {
-  on_attach = on_attach,
-  flags = lsp_flags,
-  capabilities = capabilities,
-}
-lspconfig.texlab.setup {
-  on_attach = on_attach,
-  flags = lsp_flags,
-  capabilities = capabilities,
-}
-lspconfig.lua_ls.setup {
-  on_attach = on_attach,
-  flags = lsp_flags,
-  capabilities = capabilities,
-  settings = {
-    Lua = {
-      diagnostics = {
-        globals = { 'vim' }
-      }
-    }
-  }
-}
-lspconfig.pylsp.setup {
-  on_attach = on_attach,
-  flags = lsp_flags,
-  capabilities = capabilities,
-  settings = {
-    pylsp = {
-      plugins = {
-        black = { enabled = true },
-        autopep8 = { enabled = false },
-        yapf = { enabled = false },
-        mccabe = { enabled = true },
-        -- linter options
-        pylint = { enabled = false, executable = "pylint" },
-        flake8 = { enabled = true, maxLineLength = 88 },
-        pyflakes = { enabled = false },
-        pycodestyle = { enabled = false },
-        -- type checker
-        pylsp_mypy = { enabled = true },
-        -- auto-completion options
-        jedi_completion = { fuzzy = true },
-        -- import sorting
-        pyls_isort = { enabled = true },
-      },
-    },
-  },
-}
-lspconfig.arduino_language_server.setup {
-  on_attach = on_attach,
-  flags = lsp_flags,
-  capabilities = capabilities,
-  cmd = {
-    "arduino-language-server",
-    "-cli-config", HOME .. "/.arduino15/arduino-cli.yaml",
-    "-fqbn", "arduino:avr:uno",
-    "-cli", "arduino-cli",
-    "-clangd", "clangd"
-  }
-}
-lspconfig.asm_lsp.setup {
-  on_attach = on_attach,
-  flags = lsp_flags,
-  capabilities = capabilities,
-}
+  on_attach = on_attach
+})
 
 vim.g.rustaceanvim = {
   -- Plugin configuration
@@ -484,14 +413,6 @@ vim.g.rustaceanvim = {
   dap = {
   },
 }
-
-
--- require 'lsp_signature'.setup {
---   bind = true,
---   handler_opts = {
---     border = "rounded"
---   }
--- }
 
 
 require 'lualine'.setup {
@@ -673,6 +594,7 @@ map.n['<leader'] = '<Cmd>lua require("telescope.builtin").buffers()<CR>'
 map.n['<leader>h'] = '<Cmd>lua require("telescope.builtin").help_tags()<CR>'
 map.n['<leader>m'] = '<Cmd>lua require("telescope.builtin").man_pages()<CR>'
 map.n['<leader>bb'] = '<Cmd>lua require("telescope.builtin").builtin()<CR>'
+
 
 
 require 'telescope'.setup {
