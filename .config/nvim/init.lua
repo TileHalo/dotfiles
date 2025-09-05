@@ -1,6 +1,16 @@
 -- Neovim config
 -- MAINTAINER: Leo Lahti <leo.lahti1@gmail.com>
-HOME = os.getenv("HOME")
+
+ISWIN = vim.fn.has("windows") == 1 and vim.fn.has("wsl") == 0
+ISLINUX = vim.fn.has("linux") == 1
+ISWSL = vim.fn.has("wsl") == 1
+if ISWIN then
+  USER = vim.env.USERNAME
+  HOME = vim.env.USERPROFILE
+else
+  USER = vim.env.USER
+  HOME = os.getenv("HOME")
+end
 vim.opt.autowrite = true
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
@@ -73,7 +83,7 @@ vim.g.netrw_list_hide = "netrw_gitignore#Hide()"
 
 -- Some vimtex stuff
 vim.g.vimtex_view_method = "sioyek"
-if vim.fn.has("wsl") == 1 then
+if ISWSL or ISWIN then
   vim.g.vimtex_view_enabled = "false"
 end
 
