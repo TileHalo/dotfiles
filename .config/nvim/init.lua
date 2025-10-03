@@ -449,6 +449,8 @@ map.n['<leader>s'] = '<Cmd>lua require("dap").step_into()<CR>'
 map.n['<F5>'] = '<Cmd>lua require("dap").step_over()<CR>'
 map.n['<F6>'] = '<Cmd>lua require("dap").step_into()<CR>'
 map.n['<F7>'] = '<Cmd>lua require("dap").step_out()<CR>'
+map.n['<Up>'] = '<Cmd>lua require("dap").up()<CR>'
+map.n['<Down>'] = '<Cmd>lua require("dap").down()<CR>'
 
 vim.fn.sign_define('DapBreakpoint', { text = '🛑', texthl = '', linehl = '', numhl = '' })
 
