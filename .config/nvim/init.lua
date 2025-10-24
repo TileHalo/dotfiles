@@ -245,6 +245,14 @@ require 'mason-lspconfig'.setup {
 }
 
 vim.lsp.enable("djlsp")
+
+vim.lsp.config.clangd = {
+  cmd = { 'clangd', '--background-index' },
+  root_markers = { 'compile_commands.json', 'compile_flags.txt' },
+  filetypes = { 'c', 'cpp' },
+}
+
+vim.lsp.enable({'clangd'})
 require 'referencer'.setup {}
 
 -- require 'mason-tool-installer'.setup {
@@ -353,8 +361,8 @@ vim.keymap.set({ "i", "s" }, "<C-E>", function()
 end, { silent = true })
 
 -- Set up lspconfig.
-local capabilities = require('cmp_nvim_lsp')
-    .default_capabilities(vim.lsp.protocol.make_client_capabilities())
+-- local capabilities = require('cmp_nvim_lsp')
+--     .default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 -- Lsp configs
 require 'lazydev'.setup {}
@@ -363,40 +371,44 @@ map.n.nore.silent['[d'] = '<Cmd>lua vim.diagnostic.goto_prev()<CR>'
 map.n.nore.silent[']d'] = '<Cmd>lua vim.diagnostic.goto_next()<CR>'
 map.n.nore.silent['<leader>q'] = '<Cmd>lua vim.diagnostic.setloclist()<CR>'
 
--- Use an on_attach function to only map the following keys
--- after the language server attaches to the current buffer
-local on_attach = function(_, bufnr)
-  -- Enable completion triggered by <c-x><c-o>
-  vim.api.nvim_set_option_value('omnifunc', 'v:lua.vim.lsp.omnifunc', { buf = bufnr })
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+  callback = function(ev)
+    -- Enable completion triggered by <c-x><c-o>
+    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
-  -- Mappings.
-  -- See `:help vim.lsp.*` for documentation on any of the below functions
-  local mml = map.nore.silent['buffer' .. bufnr]
-  mml['gD'] = '<Cmd>lua vim.lsp.buf.declaration()<CR>'
-  mml['gd'] = '<Cmd>lua vim.lsp.buf.definition()<CR>'
-  mml['K'] = '<Cmd>lua vim.lsp.buf.hover()<CR>'
-  mml['gi'] = '<Cmd>lua vim.lsp.buf.implementation()<CR>'
-  mml['<C-k>'] = '<Cmd>lua vim.lsp.buf.signature_help()<CR>'
-  mml['<leader>wa'] = '<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>'
-  mml['<leader>wr'] = '<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>'
-  mml['<leader>wl'] = '<Cmd>lua print(vim.inspect(vim.lsp.buf' ..
-      '.list_workspace_folders()))<CR>'
-  mml['<leader>D'] = '<Cmd>lua vim.lsp.buf.type_definition()<CR>'
-  mml['<leader>rn'] = '<Cmd>lua vim.lsp.buf.rename()<CR>'
-  mml['<leader>ca'] = '<Cmd>lua vim.lsp.buf.code_action()<CR>'
-  mml['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
-  mml['<leader>F'] = '<Cmd>lua vim.lsp.buf.format()<CR>'
-end
+    -- Buffer local mappings.
+    -- See `:help vim.lsp.*` for documentation on any of the below functions
+    local opts = { buffer = ev.buf }
+    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+    vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
+    vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
+    vim.keymap.set('n', '<space>wl', function()
+      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+    end, opts)
+    vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
+    vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
+    vim.keymap.set({ 'n', 'v' }, '<space>ca', vim.lsp.buf.code_action, opts)
+    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+    vim.keymap.set('n', '<space>f', function()
+      vim.lsp.buf.format { async = true }
+    end, opts)
+  end,
+})
 
 local lsp_flags = {
   -- This is the default in Nvim 0.7+
   debounce_text_changes = 150,
 }
 
-vim.lsp.config('*', {
-  capabilities = capabilities,
-  on_attach = on_attach
-})
+-- vim.lsp.config('*', {
+--   capabilities = capabilities,
+--   on_attach = on_attach
+-- })
 
 vim.g.rustaceanvim = {
   -- Plugin configuration
@@ -544,6 +556,8 @@ dap.configurations.c = {
 
 dap.configurations.cpp = dap.configurations.c
 require 'nvim-dap-virtual-text'.setup {}
+
+require("dap-python").setup("~/.local/share/nvim/mason/packages/debugpy/venv/bin/python")
 
 require 'texview'.texview()
 

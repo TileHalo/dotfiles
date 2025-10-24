@@ -33,6 +33,20 @@ return {
   'm-demare/hlargs.nvim',
 
   {
+    "mfussenegger/nvim-dap-python",
+    lazy = true,
+    config = function()
+      local python = vim.fn.expand("~/.local/share/nvim/mason/packages/debugpy/venv/bin/python")
+      require("dap-python").setup(python)
+    end,
+    -- Consider the mappings at
+    -- https://github.com/mfussenegger/nvim-dap-python?tab=readme-ov-file#mappings
+    dependencies = {
+      "mfussenegger/nvim-dap",
+    },
+  },
+
+  {
     "romus204/referencer.nvim",
   },
 
@@ -53,8 +67,8 @@ return {
   'mason-org/mason.nvim',
   -- 'jayp0521/mason-nvim-dap',
   {
-  'mason-org/mason-lspconfig.nvim',
-  dependencies = {'neovim/nvim-lspconfig'},
+    'mason-org/mason-lspconfig.nvim',
+    dependencies = { 'neovim/nvim-lspconfig' },
   },
   -- 'WhoIsSethDaniel/mason-tool-installer.nvim',
 
