@@ -1,6 +1,7 @@
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias aalto_remote='xfreerdp ~/school/aalto_remote.rdp /p:$(pass aalto/lahtil2 | head -n1) /f'
 alias vim='nvim'
+alias aaltovpn='gtk-launch com.cisco.secureclient.gui'
 
 if [ -z "$GHCUP_INSTALL_BASE_PREFIX" ]; then
 	GHCUP_INSTALL_BASE_PREFIX=$HOME
@@ -9,7 +10,7 @@ fi
 function matlab() {
 	LD_PRELOAD=/usr/lib/gcc/x86_64-linux-gnu/10/libstdc++.so
 	LD_LIBRARY_PATH=/usr/lib/xorg/modules/dri
-	/usr/local/bin/matlab
+	/usr/local/bin/matlab "$@"
 }
 function penv() {
 	python -m venv venv &&
